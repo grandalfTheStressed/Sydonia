@@ -1,0 +1,12 @@
+fileFormatVersion: 2
+guid: 85138f9a009e4b64fb72370f8aff171d
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - crossHatch: {fileID: 2800000, guid: 5d421c386b065854c92e829fede81a56, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -1,0 +1,4 @@
+repository "PixelGame@GR4VY_B04T@cloud"
+  path "/"
+    br "/main"
+    co "/main"
