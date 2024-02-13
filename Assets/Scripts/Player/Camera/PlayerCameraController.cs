@@ -7,7 +7,7 @@ public class PlayerCameraController
     private Camera playerCamera;
     private Input input;
 
-    private float _rotationSensitivity = 5f;
+    private float rotationSensitivity = 5f;
 
     private Quaternion targetRotation;
     private float targetOrthoSize;
@@ -57,7 +57,7 @@ public class PlayerCameraController
     }
 
     private void UpdateCameraRotation(bool isTargeting) {
-        float rotationStrength = _rotationSensitivity * 100;
+        float rotationStrength = rotationSensitivity * 100;
         
         Vector2 cameraRotInput = input.GetCameraRotationInput();
         targetRotation = Quaternion.Euler(

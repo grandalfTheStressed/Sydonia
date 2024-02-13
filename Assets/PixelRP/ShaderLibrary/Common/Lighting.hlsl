@@ -4,8 +4,6 @@
 #include "./ToonShading.hlsl"
 #include "./Light.hlsl"
 
-#define MAX_DIRECTIONAL_LIGHT_COUNT 4
-
 float3 GetLighting(Surface surface, Light light) {
 	return TBR(surface, light);
 }

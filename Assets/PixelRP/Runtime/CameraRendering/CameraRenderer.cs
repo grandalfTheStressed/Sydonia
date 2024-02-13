@@ -62,7 +62,7 @@ public partial class CameraRenderer {
         DrawGizmos();
 
         buffer.Blit(_geometry, BuiltinRenderTextureType.CameraTarget);
-        cleanUp();
+        CleanUp();
         Submit();
     }
 
@@ -129,12 +129,6 @@ public partial class CameraRenderer {
         FilteringSettings filteringSettings = new FilteringSettings(RenderQueueRange.all);
         context.DrawRenderers(cullingResults, ref drawingSettings, ref filteringSettings);
         drawingSettings.SetShaderPassName(0, ShaderTagId.none);
-        
-        buffer.SetGlobalTexture("_Albedo", _albedo);
-        buffer.SetGlobalTexture("_Normal", _normal);
-        buffer.SetGlobalTexture("_position", _position);
-        buffer.SetGlobalTexture("_Offset", _offset);
-        buffer.SetGlobalTexture("_Edge", _edge);
         
         buffer.Blit(_albedo, _geometry, deferredMaterial, 1);
         buffer.EndSample(SampleName);
@@ -207,7 +201,7 @@ public partial class CameraRenderer {
         buffer.Clear();
     }
 
-    private void cleanUp() {
+    private void CleanUp() {
         buffer.ReleaseTemporaryRT(_geometry);
         buffer.ReleaseTemporaryRT(_fx);
         buffer.ReleaseTemporaryRT(_albedo);

@@ -3,13 +3,13 @@
 
 struct Surface {
 	float2 baseUV;
-	float3 crossHatch;
-	float2 ndc; 
 	float3 position;
 	float3 depth;
 	float3 normal;
 	float3 viewDirection;
 	float3 albedo;
+	
+	uint renderingLayerMask;
 
 	float dither;
 	

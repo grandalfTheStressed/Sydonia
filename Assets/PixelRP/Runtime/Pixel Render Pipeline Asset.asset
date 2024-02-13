@@ -15,4 +15,18 @@ MonoBehaviour:
   srpBatching: 1
   dynamicBatching: 1
   instancing: 1
-  crossHatch: {fileID: 2800000, guid: 5d421c386b065854c92e829fede81a56, type: 3}
+  shadowSettings:
+    maxDistance: 342.3
+    distanceFade: 0.015
+    directional:
+      atlasSize: 8192
+      filter: 0
+      cascadeCount: 1
+      cascadeRatio1: 0.298
+      cascadeRatio2: 0.807
+      cascadeRatio3: 0.244
+      cascadeFade: 0.431
+      cascadeBlend: 0
+    punctual:
+      atlasSize: 1024
+      filter: 0

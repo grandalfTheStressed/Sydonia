@@ -11,6 +11,7 @@ public class Lighting {
     private static int _dirLightCountId = Shader.PropertyToID("_DirectionalLightCount");
     private static int _dirLightColorsId = Shader.PropertyToID("_DirectionalLightColors");
     private static int _dirLightDirectionsId = Shader.PropertyToID("_DirectionalLightDirections");
+    private static int _dirLightShadowDataId = Shader.PropertyToID("_DirectionalLightShadowData");
     
     private static int _punctualLightCountId = Shader.PropertyToID("_PunctualLightCount");
     private static int _punctualLightColorsId = Shader.PropertyToID("_PunctualLightColors");
@@ -20,6 +21,7 @@ public class Lighting {
 
     private static Vector4[] _dirLightColors = new Vector4[MaxDirLightCount];
     private static Vector4[] _dirLightDirections = new Vector4[MaxDirLightCount];
+    private static Vector4[] _dirLightShadowData = new Vector4[MaxDirLightCount];
     
     private static Vector4[] _punctualLightColors = new Vector4[MaxPunctualLights];
     private static Vector4[] _punctualLightPositions = new Vector4[MaxPunctualLights];
@@ -83,6 +85,7 @@ public class Lighting {
         buffer.SetGlobalInt(_punctualLightCountId, puncLightCount);
         buffer.SetGlobalVectorArray(_dirLightColorsId, _dirLightColors);
         buffer.SetGlobalVectorArray(_dirLightDirectionsId, _dirLightDirections);
+        buffer.SetGlobalVectorArray(_dirLightShadowDataId, _dirLightShadowData);
         buffer.SetGlobalVectorArray(_punctualLightColorsId, _punctualLightColors);
         buffer.SetGlobalVectorArray(_punctualLightPositionsId, _punctualLightPositions);
         buffer.SetGlobalVectorArray(_punctualLightDirectionsId, _punctualLightDirections);
@@ -92,7 +95,7 @@ public class Lighting {
     private void SetupDirectionalLight (int index, ref VisibleLight visibleLight) {
         _dirLightColors[index] = visibleLight.finalColor;
         _dirLightDirections[index] = -visibleLight.localToWorldMatrix.GetColumn(2);
-        _shadows.ReserveDirectionalShadows(visibleLight.light, index);
+        _dirLightShadowData[index] = _shadows.ReserveDirectionalShadows(visibleLight.light, index);
     }
     
     private void SetupPointLight(int index, ref VisibleLight visibleLight) {

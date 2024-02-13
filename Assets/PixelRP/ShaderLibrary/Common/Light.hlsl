@@ -6,6 +6,7 @@
 
 #include "./Utils.hlsl"
 #include "./Surface.hlsl"
+#include "./Shadow.hlsl"
 
 CBUFFER_START(_Light)
 int _DirectionalLightCount;
@@ -18,6 +19,7 @@ float4 _PunctualLightColors[MAX_PUNCTUAL_LIGHT_COUNT];
 float4 _PunctualLightPositions[MAX_PUNCTUAL_LIGHT_COUNT];
 float4 _PunctualLightDirections[MAX_PUNCTUAL_LIGHT_COUNT];
 float4 _PunctualLightSpotAngles[MAX_PUNCTUAL_LIGHT_COUNT];
+float4 _PunctualLightShadowData[MAX_PUNCTUAL_LIGHT_COUNT];
 CBUFFER_END
 
 struct Light {
@@ -27,38 +29,44 @@ struct Light {
 	float shadowAttenuation;
 };
 
-int GetDirectionalLightCount() {
+int GetDirectionalLightCount () {
 	return _DirectionalLightCount;
 }
 
-Light GetDirectionalLight(int index, Surface s) {
+DirectionalShadowData GetDirectionalShadowData (int lightIndex) {
+	DirectionalShadowData data;
+	data.strength = _DirectionalLightShadowData[lightIndex].x;
+	data.tileIndex = _DirectionalLightShadowData[lightIndex].y;
+	return data;
+}
+
+Light GetDirectionalLight (int index, Surface surface) {
 	Light light;
 	light.color = _DirectionalLightColors[index].rgb;
 	light.direction = _DirectionalLightDirections[index].xyz;
+	DirectionalShadowData dirShadowData = GetDirectionalShadowData(index);
 	light.attenuation = 1;
-	light.shadowAttenuation = 1;
+	light.shadowAttenuation = GetDirectionalShadowAttenuation(dirShadowData, surface);
 	return light;
 }
 
-int GetPunctualLightCount()
-{
+int GetPunctualLightCount () {
 	return _PunctualLightCount;
 }
 
-Light GetPunctualLight(int index, Surface s) {
-
+Light GetPunctualLight (int index, Surface surface) {
 	Light light;
 	light.color = _PunctualLightColors[index].rgb;
 	float3 position = _PunctualLightPositions[index].xyz;
-	float3 ray = position - s.position;
+	float3 ray = position - surface.position;
 	light.direction = normalize(ray);
 	float distanceSqr = max(dot(ray, ray), 0.00001);
 	float rangeAttenuation = Square(saturate(1.0 - Square(distanceSqr * _PunctualLightPositions[index].w)));
 	float4 spotAngles = _PunctualLightSpotAngles[index];
-	float spotAttenuation = Square(saturate(dot(_PunctualLightDirections[index].xyz, light.direction) * spotAngles.x + spotAngles.y));
+	float3 spotDirection = _PunctualLightDirections[index].xyz;
+	float spotAttenuation = Square(saturate(dot(spotDirection, light.direction) *spotAngles.x + spotAngles.y));
 	light.attenuation = spotAttenuation * rangeAttenuation / distanceSqr;
 	light.shadowAttenuation = 1;
 	return light;
 }
-
 #endif

@@ -10,7 +10,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Camera playerCamera;
 
     private PlayerCameraController playerCameraController;
-    private TargetTracker _targetTracker;
+    private TargetTracker targetTracker;
 
     private GameObject target;
     
@@ -22,7 +22,7 @@ public class PlayerController : MonoBehaviour
     public void Start()
     {
         playerCameraController = new PlayerCameraController(playerCamera, input);
-        _targetTracker = GetComponentInChildren<TargetTracker>();
+        targetTracker = GetComponentInChildren<TargetTracker>();
         rigidBody = GetComponent<Rigidbody>();
         rigidBody.freezeRotation = true;
         rigidBody.drag = drag;
@@ -53,7 +53,7 @@ public class PlayerController : MonoBehaviour
             return transform.position - (transform.position - target.transform.position) * .5f;
         }
         
-        target = _targetTracker.UpdateClosetTarget();
+        target = targetTracker.UpdateClosetTarget();
         
         return transform.position;
     }

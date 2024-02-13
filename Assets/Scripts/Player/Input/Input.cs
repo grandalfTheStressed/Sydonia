@@ -7,12 +7,12 @@ public class Input : MonoBehaviour
 
     private void Awake()
     {
-        enable();
+        Enable();
     }
 
     private void OnValidate()
     {
-        enable();
+        Enable();
     }
     
     public bool GetLockOnInput()
@@ -23,7 +23,7 @@ public class Input : MonoBehaviour
         }
         catch (Exception)
         {
-            enable();
+            Enable();
         }
 
         return false;
@@ -37,7 +37,7 @@ public class Input : MonoBehaviour
         }
         catch (Exception)
         {
-            enable();
+            Enable();
         }
 
         return Vector2.zero;
@@ -51,7 +51,7 @@ public class Input : MonoBehaviour
         }
         catch (Exception)
         {
-            enable();
+            Enable();
         }
         
         return Vector2.zero;
@@ -65,13 +65,13 @@ public class Input : MonoBehaviour
         }
         catch (Exception)
         {
-            enable();
+            Enable();
         }
         
         return Vector2.zero;
     }
 
-    private void enable()
+    private void Enable()
     {
         inputActions = new InputActions();
         inputActions.Player.Enable();
