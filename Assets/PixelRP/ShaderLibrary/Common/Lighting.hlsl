@@ -9,9 +9,10 @@ float3 GetLighting(Surface surface, Light light) {
 }
 
 float3 GetLighting(Surface s) {
+	ShadowData sd = GetShadowData(s);
 	float3 color = 0.0;
 	for (int i = 0; i < GetDirectionalLightCount(); i++) {
-		color += GetLighting(s, GetDirectionalLight(i, s));
+		color += GetLighting(s, GetDirectionalLight(i, s, sd));
 	}
 	for(int i = 0; i < GetPunctualLightCount(); i++)
 	{

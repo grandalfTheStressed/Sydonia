@@ -24,11 +24,8 @@ struct Surface {
 	
 	float specularEdge;
 	float specularOffset;
-	
-	float distanceAttenuationEdge;
 
-	float ShadingResolution;
-	float shadingOffset;
+	float shininess;
 };
 
 #endif

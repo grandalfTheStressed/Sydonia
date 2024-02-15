@@ -4,6 +4,7 @@ Shader "Pixel RP/ForwardLit"
     {
         _BaseMap("Texture", 2D) = "white" {}
         _NormalMap("NormalMap", 2D) = "bump" {}
+    	[KeywordEnum(On, Clip, Dither, Off)] _Shadows ("Shadows", Float) = 0
         [Toggle(_CLIPPING)] _Clipping("Alpha Clipping", Float) = 0
         [Toggle(_PREMULTIPLY_ALPHA)] _PremulAlpha("Premultiply Alpha", Float) = 0
         [Enum(UnityEngine.Rendering.BlendMode)] _SrcBlend("Src Blend", Float) = 1
@@ -20,6 +21,8 @@ Shader "Pixel RP/ForwardLit"
         
         _SpecularEdge("SpecularEdge", Range(0, 1)) = 0.1
         _SpecularOffset("SpecularOffset", Range(0, 1)) = 0.1
+    	
+    	_Smoothness("Smoothness", Range(0, 1)) = 0.5
         
         [Enum(Off, 0, On, 1)] _ZWrite("Z Write", Float) = 1
     }
@@ -56,7 +59,7 @@ Shader "Pixel RP/ForwardLit"
 
 			HLSLPROGRAM
 			#pragma target 3.5
-			#pragma shader_feature _ _SHADOWS_CLIP _SHADOWS_DITHER
+			#pragma shader_feature _ _SHADOWS_CLIP _SHADOWS_DITHER _SHADOWS_OFF
 			#pragma multi_compile _ LOD_FADE_CROSSFADE
 			#pragma multi_compile_instancing
 			#pragma vertex ShadowCasterPassVertex

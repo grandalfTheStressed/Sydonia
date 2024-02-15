@@ -1,17 +1,14 @@
 using System;
 using UnityEngine;
 
-public class Input : MonoBehaviour
-{
+public class Input : MonoBehaviour {
     private InputActions inputActions;
 
-    private void Awake()
-    {
+    private void Awake() {
         Enable();
     }
 
-    private void OnValidate()
-    {
+    private void OnValidate() {
         Enable();
     }
     
@@ -29,8 +26,7 @@ public class Input : MonoBehaviour
         return false;
     }
 
-    public Vector2 GetDirectionalInput()
-    {
+    public Vector2 GetDirectionalInput() {
         try
         {
             return inputActions.Player.Move.ReadValue<Vector2>().normalized;
@@ -43,8 +39,7 @@ public class Input : MonoBehaviour
         return Vector2.zero;
     }
 
-    public Vector2 GetCameraRotationInput()
-    {
+    public Vector2 GetCameraRotationInput() {
         try
         {
             return inputActions.Player.Rotate.ReadValue<Vector2>().normalized;
@@ -57,8 +52,7 @@ public class Input : MonoBehaviour
         return Vector2.zero;
     }
 
-    public Vector2 GetCameraZoomInput()
-    {
+    public Vector2 GetCameraZoomInput() {
         try
         {
             return inputActions.Player.Zoom.ReadValue<Vector2>().normalized;
@@ -71,19 +65,16 @@ public class Input : MonoBehaviour
         return Vector2.zero;
     }
 
-    private void Enable()
-    {
+    private void Enable() {
         inputActions = new InputActions();
         inputActions.Player.Enable();
     }
 
-    private void Start()
-    {
+    private void Start() {
         
     }
 
-    private void Update()
-    {
+    private void Update() {
         
     }
 }

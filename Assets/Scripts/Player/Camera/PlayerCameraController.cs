@@ -1,8 +1,7 @@
 using System;
 using UnityEngine;
 
-public class PlayerCameraController
-{
+public class PlayerCameraController {
     private AnimationCurve cameraMovementCurve = AnimationCurve.Linear(0.0f, 0.0f, 1.0f, 1.0f);
     private Camera playerCamera;
     private Input input;
@@ -16,8 +15,7 @@ public class PlayerCameraController
 
     public Vector3 FlattenedForward => flattenedForward;
 
-    public PlayerCameraController(Camera playerCamera, Input input)
-    {
+    public PlayerCameraController(Camera playerCamera, Input input) {
         this.playerCamera = playerCamera;
         this.input = input;
         targetOrthoSize = playerCamera.orthographicSize;
@@ -37,17 +35,15 @@ public class PlayerCameraController
         flattenedForward = Vector3.Normalize(cameraForward);
     }
 
-    private void UpdateCameraPosition(Vector3 focus)
-    {
+    private void UpdateCameraPosition(Vector3 focus) {
         playerCamera.transform.position = 
             Vector3.Lerp(
                 playerCamera.transform.position, 
-                focus + Vector3.up * (targetOrthoSize * (1 - targetRotation.eulerAngles.x / 70)), 
+                focus + Vector3.up * (2 * (1 - targetRotation.eulerAngles.x / 70)), 
                 cameraMovementCurve.Evaluate(Time.deltaTime) * (22 / targetOrthoSize));
     }
 
-    private void UpdateCameraZoom()
-    {
+    private void UpdateCameraZoom() {
         targetOrthoSize -= input.GetCameraZoomInput().y * 4;
         targetOrthoSize = Math.Clamp(targetOrthoSize, 2, 22);
         

@@ -26,7 +26,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _BaseMap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 10309, guid: 0000000000000000f000000000000000, type: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
@@ -82,8 +82,8 @@ Material:
     - _Clipping: 0
     - _Cutoff: 0
     - _DetailNormalMapScale: 1
-    - _DiffuseEdge: 0.424
-    - _DiffuseOffset: 0.357
+    - _DiffuseEdge: 0.341
+    - _DiffuseOffset: 0.404
     - _DistanceAttenuationEdge: 0.49
     - _DstBlend: 0
     - _Emission: 0
@@ -96,23 +96,23 @@ Material:
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _PremulAlpha: 0
-    - _RimEdge: 1.925
-    - _RimOffset: 0.592
+    - _RimEdge: 0.702
+    - _RimOffset: 0.942
     - _RimThreshold: 0
     - _Roughness: 1
     - _ShadingOffset: 0.747
     - _ShadingResolution: 93.9
-    - _Smoothness: 0.5
+    - _Smoothness: 0.524
     - _SmoothnessTextureChannel: 0
-    - _SpecularEdge: 0.226
+    - _SpecularEdge: 0.389
     - _SpecularHighlights: 1
-    - _SpecularOffset: 1
+    - _SpecularOffset: 0.438
     - _SrcBlend: 1
     - _TintBenDay: 1
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
-    - _BaseColor: {r: 0.09803921, g: 1, b: 0.9908873, a: 1}
+    - _BaseColor: {r: 0.3047348, g: 0.6037736, b: 0.6014282, a: 1}
     - _BenDayTint: {r: 0, g: 0, b: 0, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}

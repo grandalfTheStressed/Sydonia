@@ -25,6 +25,8 @@ UNITY_DEFINE_INSTANCED_PROP(float, _DiffuseOffset)
 UNITY_DEFINE_INSTANCED_PROP(float, _SpecularEdge)
 UNITY_DEFINE_INSTANCED_PROP(float, _SpecularOffset)
 
+UNITY_DEFINE_INSTANCED_PROP(float, _Smoothness)
+
 UNITY_INSTANCING_BUFFER_END(UnityPerMaterial)
 
 struct Attributes {
@@ -83,12 +85,12 @@ Fragments GeometryPassFragment(Interpolates input) {
 		UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _RimOffset),
 		UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _DiffuseOffset),
 		UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _SpecularOffset),
-		0);
+		exp2(10 * UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Smoothness) + 1));
 	frag.edges = float4(
 		UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _RimEdge),
 		UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _DiffuseEdge),
 		UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _SpecularEdge),
-		0);
+		InterleavedGradientNoise(input.positionCS.xy, 0));
 	//UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Emission)
 	return frag;
 }

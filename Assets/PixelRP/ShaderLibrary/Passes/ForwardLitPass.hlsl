@@ -27,6 +27,8 @@ UNITY_DEFINE_INSTANCED_PROP(float, _DiffuseOffset)
 UNITY_DEFINE_INSTANCED_PROP(float, _SpecularEdge)
 UNITY_DEFINE_INSTANCED_PROP(float, _SpecularOffset)
 
+UNITY_DEFINE_INSTANCED_PROP(float, _Smoothness)
+
 UNITY_INSTANCING_BUFFER_END(UnityPerMaterial)
 
 struct Attributes {
@@ -82,6 +84,8 @@ float4 LitPassFragment(Interpolates input) : SV_TARGET {
 	{
 		surface.viewDirection = normalize(_WorldSpaceCameraPos - input.positionWS);
 	}
+
+	surface.depth = -TransformWorldToView(input.positionWS).z;
 	
 	surface.albedo = base.rgb;
 	surface.alpha = base.a;
@@ -95,7 +99,8 @@ float4 LitPassFragment(Interpolates input) : SV_TARGET {
 	surface.specularEdge = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _SpecularEdge) / 2;
 	surface.specularOffset = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _SpecularOffset) * 2;
 	
-
+	surface.shininess = exp2(10 * UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Smoothness) + 1);
+	surface.dither = InterleavedGradientNoise(input.positionCS.xy, 0);
 	#ifdef _CLIPPING
 	clip(base.a - UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Cutoff));
 	#endif

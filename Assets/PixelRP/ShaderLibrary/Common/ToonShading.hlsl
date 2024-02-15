@@ -4,65 +4,52 @@
 #include "../Common/Surface.hlsl"
 #include "./Light.hlsl"
 
-float3 GoochColor(float3 color, float NdotL, float warmIntensity, float coolIntensity)
-{
-    const float3 warm = float3(.8, .8, 0) * warmIntensity;
-    const float3 cool = float3(0, 0, 1) * coolIntensity;
-    
-    float3 kWarm = (warm + (1 - warmIntensity) * color);
-    float3 kCool = (cool + (1 - coolIntensity) * color);
-    
-    return max(NdotL * kWarm, (1 - NdotL) * kCool);
-}
-
 float3 GetIncomingLightDirection(Light light)
 {
     return normalize(light.direction);
 }
 
-float3 GetLumenocity(Light light, float NdotL)
+float GetLumenocity(Light light, float NdotL)
 {
-    return NdotL * light.attenuation * light.shadowAttenuation;
+    //hiding gross self shadows
+    float lumenocity = NdotL * light.attenuation * light.shadowAttenuation;
+    lumenocity += (1 - lumenocity) * .03;
+    return lumenocity;
 }
 
-float3 GetRadiance(Light light, float NdotL)
-{
-    return GetLumenocity(light, NdotL) * light.color;
-}
-
-float3 GetRadiance(Light light, float3 lumenocity)
+float3 GetRadiance(Light light, float lumenocity)
 {
     return lumenocity * light.color;
 }
 
 float3 RimLight(Surface surface, float NdotV)
 {
-    return (1 - surface.rimOffset) * saturate(1 - NdotV * 2 * surface.rimEdge);
+    float rim = surface.rimOffset * smoothstep(surface.rimEdge - 0.01, surface.rimEdge + 0.01, (1 - NdotV));
+    return rim * surface.albedo;
 }
 
-float3 Specular(Surface surface, float RdotV) 
+float3 Specular(Surface surface, float RdotV, float lumenocity) 
 {
-    float specular = RdotV * surface.specularEdge;
-    return specular;
+    return pow(RdotV, surface.shininess) * surface.specularEdge * lumenocity;
 }
 
 float3 TBR(Surface surface, Light light)
 {
-    const float lightDir = GetIncomingLightDirection(light);
-    const float NdotL = Qdot(surface.normal, lightDir) * .5 + .5;
+    const float3 lightDir = GetIncomingLightDirection(light);
+    const float NdotL = Qdot(surface.normal, lightDir) > 0 ? 1 : 0;
     const float3 reflection = reflect(-lightDir, surface.normal);
-    const float3 lumenocity = GetLumenocity(light, NdotL);
+    const float lumenocity = GetLumenocity(light, NdotL);
     const float3 radiance = GetRadiance(light, lumenocity);
     const float NdotV = Qdot(surface.normal, surface.viewDirection);
     const float RdotV = Qdot(reflection, surface.viewDirection);
-    float3 diffuse = GoochColor(surface.albedo, NdotL, 0, 0);
+
+    float3 diffuse = radiance * surface.albedo;
+    float3 specular = surface.specularOffset * 2 * Quantize(Specular(surface, RdotV, lumenocity), .2);
+    specular = smoothstep(0.005, 0.01, specular) ;
     
-    //float3 rimLight = RimLight(surface, NdotV);
-    float3 specular = surface.specularOffset * 2 * Quantize(Specular(surface, RdotV), .2);
-    //specular = Quantize(specular, surface.specularEdge);
-    //specular = max(specular, rimLight);
+    float3 rimLight = RimLight(surface, NdotV);
     
-    float3 reflectance = (.7 * diffuse + specular * .3) * radiance;
+    float3 reflectance = diffuse + max(specular, rimLight);
     
     #if defined(_PREMULTIPLY_ALPHA)
 	reflectance *= surface.alpha;

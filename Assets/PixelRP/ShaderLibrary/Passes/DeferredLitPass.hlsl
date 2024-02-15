@@ -59,6 +59,8 @@ float4 DeferredPassFragment(Interpolates input) : SV_TARGET {
 	{
 		surface.viewDirection = normalize(_WorldSpaceCameraPos - surface.position);
 	}
+
+	surface.depth = -TransformWorldToView(surface.position).z;
 	
 	surface.albedo = albedoFrag.rgb;
 	surface.alpha = 1;
@@ -72,6 +74,9 @@ float4 DeferredPassFragment(Interpolates input) : SV_TARGET {
 
 	surface.specularEdge = edgeFrag.b;
 	surface.specularOffset = offsetFrag.b;
+
+	surface.shininess = offsetFrag.a;
+	surface.dither = edgeFrag.a;
 	
 	float3 color = GetLighting(surface);
 	return float4(color, albedoFrag.a);

@@ -16,17 +16,17 @@ MonoBehaviour:
   dynamicBatching: 1
   instancing: 1
   shadowSettings:
-    maxDistance: 342.3
-    distanceFade: 0.015
+    maxDistance: 30
+    distanceFade: 0.049
     directional:
       atlasSize: 8192
-      filter: 0
-      cascadeCount: 1
-      cascadeRatio1: 0.298
-      cascadeRatio2: 0.807
-      cascadeRatio3: 0.244
-      cascadeFade: 0.431
-      cascadeBlend: 0
+      filter: 2
+      cascadeCount: 4
+      cascadeRatio1: 0.2
+      cascadeRatio2: 0.4
+      cascadeRatio3: 0.5
+      cascadeFade: 0.051
+      cascadeBlend: 1
     punctual:
       atlasSize: 1024
       filter: 0
