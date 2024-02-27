@@ -11,7 +11,6 @@ public class PlayerController : MonoBehaviour
 
     private PlayerCameraController playerCameraController;
     private TargetTracker targetTracker;
-
     private GameObject target;
     
     private bool isWalking;
@@ -27,7 +26,7 @@ public class PlayerController : MonoBehaviour
         rigidBody.freezeRotation = true;
         rigidBody.drag = drag;
         movementForce = rigidBody.mass * acceleration;
-        dragHack = Mathf.Pow(1 - Time.fixedDeltaTime, 2);
+        dragHack = Mathf.Pow(1 - Time.fixedDeltaTime, 5);
     }
 
     private void OnValidate()
@@ -100,7 +99,9 @@ public class PlayerController : MonoBehaviour
 
             float centripAccel = rigidBody.velocity.sqrMagnitude / dragHack / targetDir.magnitude;
             
-            if(centripAccel > 0 && centripAccel < acceleration)
+            centripAccel = centripAccel < acceleration ? centripAccel : acceleration;
+            
+            if(centripAccel > 0)
                 rigidBody.AddForce(transform.forward * (centripAccel * rigidBody.mass));
             
             moveDir =  transform.forward * directionalInput.z + 

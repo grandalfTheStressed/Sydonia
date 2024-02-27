@@ -1,10 +1,12 @@
+using System;
 using UnityEngine;
 using UnityEngine.Rendering;
 
 public class Shadows {
 	private const string BufferName = "Shadows";
 
-	private const int MaxShadowedDirLightCount = 4, MaxShadowedPunctualLightCount = 16;
+	private const int MaxShadowedDirLightCount = 4;
+	private const int MaxShadowedPunctualLightCount = 512;
 	private const int MaxCascades = 4;
 
 	private static readonly string[] DirectionalFilterKeywords = {
@@ -14,19 +16,14 @@ public class Shadows {
 	};
 
 	private static readonly string[] PunctualFilterKeywords = {
-		"_Punctual_PCF3",
-		"_Punctual_PCF5",
-		"_Punctual_PCF7"
+		"_PUNCTUAL_PCF3",
+		"_PUNCTUAL_PCF5",
+		"_PUNCTUAL_PCF7"
 	};
 
 	private static readonly string[] CascadeBlendKeywords = {
 		"_CASCADE_BLEND_SOFT",
 		"_CASCADE_BLEND_DITHER"
-	};
-
-	private static readonly string[] ShadowMaskKeywords = {
-		"_SHADOW_MASK_ALWAYS",
-		"_SHADOW_MASK_DISTANCE"
 	};
 
 	private static readonly int DirShadowAtlasId = Shader.PropertyToID("_DirectionalShadowAtlas");
@@ -40,6 +37,8 @@ public class Shadows {
 	private static readonly int ShadowAtlasSizeId = Shader.PropertyToID("_ShadowAtlasSize");
 	private static readonly int ShadowDistanceFadeId = Shader.PropertyToID("_ShadowDistanceFade");
 	private static readonly int ShadowPancakingId = Shader.PropertyToID("_ShadowPancaking");
+	private static readonly int JitterId = Shader.PropertyToID("_Jitter");
+	private static readonly int NoiseOffsetId = Shader.PropertyToID("_NoiseOffset");
 
 	private static readonly Vector4[] CascadeCullingSpheres = new Vector4[MaxCascades];
 	private static readonly Vector4[] CascadeData = new Vector4[MaxCascades];
@@ -66,10 +65,10 @@ public class Shadows {
 	private readonly ShadowedDirectionalLight[] shadowedDirectionalLights = new ShadowedDirectionalLight[MaxShadowedDirLightCount];
 	private readonly ShadowedPunctualLight[] shadowedPunctualLights = new ShadowedPunctualLight[MaxShadowedPunctualLightCount];
 
-	private int shadowedDirLightCount, shadowedPunctualLightCount;
-
-	private readonly CommandBuffer buffer = new()
-	{
+	private int shadowedDirLightCount;
+	private int shadowedPunctualLightCount;
+	
+	private readonly CommandBuffer buffer = new() {
 		name = BufferName
 	};
 
@@ -106,10 +105,30 @@ public class Shadows {
 				DirShadowAtlasId, 
 				1, 
 				1,
-				32, 
+				24, 
 				FilterMode.Bilinear, 
 				RenderTextureFormat.Shadowmap);
 		} 
+		if (shadowedPunctualLightCount > 0) {
+			RenderPunctualShadows();
+		}
+		else {
+			buffer.SetGlobalTexture(PunctualShadowAtlasId, DirShadowAtlasId);
+		}
+	
+		buffer.SetGlobalInt(CascadeCountId, shadowedDirLightCount > 0 ? shadowSettings.directional.cascadeCount : 0);
+
+		float f = 1f - shadowSettings.directional.cascadeFade;
+		buffer.SetGlobalVector(ShadowDistanceFadeId, new Vector4(
+			1f / shadowSettings.maxDistance, 
+			1f / shadowSettings.distanceFade,
+			1f / (1f - f * f)));
+		
+		buffer.SetGlobalVector(ShadowAtlasSizeId, atlasSizes);
+		buffer.SetGlobalFloat(JitterId, shadowSettings.jitter);
+		buffer.SetGlobalFloat(NoiseOffsetId, shadowSettings.noiseOffset);
+		
+		ExecuteBuffer();
 	}
 
 	public Vector4 ReserveDirectionalShadows(Light light, int visibleLightIndex)
@@ -140,18 +159,19 @@ public class Shadows {
 		atlasSizes.y = 1f / atlasSize;
 		buffer.GetTemporaryRT(DirShadowAtlasId, 
 			atlasSize, atlasSize, 
-			32, 
+			24, 
 			FilterMode.Bilinear,
 			RenderTextureFormat.Shadowmap);
 		buffer.SetRenderTarget(DirShadowAtlasId, RenderBufferLoadAction.DontCare, RenderBufferStoreAction.Store);
 		buffer.ClearRenderTarget(true, false, Color.clear);
+		buffer.SetGlobalFloat(ShadowPancakingId, 1f);
 		buffer.BeginSample(BufferName);
 		ExecuteBuffer();
-
+		
 		int tiles = shadowedDirLightCount * shadowSettings.directional.cascadeCount;
-		int split = tiles <= 1 ? 1 : tiles <= 4 ? 2 : 4;
+		int split = (int)Math.Ceiling(Math.Sqrt(tiles));
 		int tileSize = atlasSize / split;
-
+		
 		for (int i = 0; i < shadowedDirLightCount; i++)
 		{
 			RenderDirectionalShadow(i, split, tileSize);
@@ -161,18 +181,8 @@ public class Shadows {
 		buffer.SetGlobalVectorArray(CascadeCullingSpheresId, CascadeCullingSpheres);
 		buffer.SetGlobalVectorArray(CascadeDataId, CascadeData);
 		buffer.SetGlobalMatrixArray(DirShadowMatricesId, DirShadowMatrices);
-		buffer.BeginSample(BufferName);
-		buffer.SetGlobalInt(CascadeCountId, shadowedDirLightCount > 0 ? shadowSettings.directional.cascadeCount : 0);
 		SetKeywords(DirectionalFilterKeywords, (int)shadowSettings.directional.filter - 1);
 		SetKeywords(CascadeBlendKeywords, (int)shadowSettings.directional.cascadeBlend - 1);
-		buffer.EndSample(BufferName);
-		
-		float f = 1f - shadowSettings.directional.cascadeFade;
-		buffer.SetGlobalVector(ShadowDistanceFadeId, new Vector4(
-			1f / shadowSettings.maxDistance, 
-			1f / shadowSettings.distanceFade,
-			1f / (1f - f * f)));
-		buffer.SetGlobalVector(ShadowAtlasSizeId, atlasSizes);
 		buffer.EndSample(BufferName);
 		ExecuteBuffer();
 	}
@@ -184,6 +194,8 @@ public class Shadows {
 			cullingResults, 
 			light.VisibleLightIndex, 
 			BatchCullingProjectionType.Orthographic);
+		
+		
 		
 		int cascadeCount = shadowSettings.directional.cascadeCount;
 		int tileOffset = index * cascadeCount;
@@ -214,6 +226,140 @@ public class Shadows {
 				projectionMatrix * viewMatrix, 
 				SetTileViewport(tileIndex, split, tileSize), 
 				tileScale);
+			buffer.SetViewProjectionMatrices(viewMatrix, projectionMatrix);
+			buffer.SetGlobalDepthBias(0f, light.SlopeScaleBias);
+			ExecuteBuffer();
+			context.DrawShadows(ref shadowDrawingSettings);
+			buffer.SetGlobalDepthBias(0f, 0f);
+		}
+	}
+	
+	public Vector4 ReservePunctualShadows (Light light, int visibleLightIndex) {
+		bool isPoint = light.type == LightType.Point;
+		int newLightCount = shadowedPunctualLightCount + (isPoint ? 6 : 1);
+		if (light.shadows == LightShadows.None || 
+		    light.shadowStrength <= 0f || 
+		    newLightCount > MaxShadowedPunctualLightCount ||
+		    !cullingResults.GetShadowCasterBounds(visibleLightIndex, out Bounds b)) {
+			return new Vector4(0f, 0f, 0f, -1f);
+		}
+
+		shadowedPunctualLights[shadowedPunctualLightCount] = new ShadowedPunctualLight {
+			VisibleLightIndex = visibleLightIndex,
+			SlopeScaleBias = light.shadowBias,
+			NormalBias = light.shadowNormalBias,
+			IsPoint = isPoint
+		};
+
+		Vector4 data = new Vector4(light.shadowStrength, shadowedPunctualLightCount, isPoint ? 1f : 0f, -1);
+		shadowedPunctualLightCount = newLightCount;
+
+		return data;
+	}
+	
+	private void RenderPunctualShadows()
+	{
+		int atlasSize = (int)shadowSettings.punctual.atlasSize;
+		atlasSizes.z = atlasSize;
+		atlasSizes.w = 1f / atlasSize;
+		buffer.GetTemporaryRT(PunctualShadowAtlasId, 
+			atlasSize, atlasSize, 
+			32, 
+			FilterMode.Bilinear,
+			RenderTextureFormat.Shadowmap);
+		buffer.SetRenderTarget(PunctualShadowAtlasId, RenderBufferLoadAction.DontCare, RenderBufferStoreAction.Store);
+		buffer.ClearRenderTarget(true, false, Color.clear);
+		buffer.SetGlobalFloat(ShadowPancakingId, 0f);
+		buffer.BeginSample(BufferName);
+		ExecuteBuffer();
+		
+		int tiles = shadowedPunctualLightCount;
+		int split = (int)Math.Ceiling(Math.Sqrt(tiles));
+		int tileSize = atlasSize / split;
+
+		for (int i = 0; i < shadowedPunctualLightCount;)
+		{
+			if (shadowedPunctualLights[i].IsPoint) {
+				RenderPointShadow(i, split, tileSize);
+				i += 6;
+			}
+			else {
+				RenderSpotShadow(i, split, tileSize);
+				i += 1;
+			}
+		}
+
+		buffer.SetGlobalMatrixArray(PunctualShadowMatricesId, PunctualShadowMatrices);
+		buffer.SetGlobalVectorArray(PunctualShadowTilesId, PunctualShadowTiles);
+		SetKeywords(PunctualFilterKeywords, (int)shadowSettings.punctual.filter - 1);
+		buffer.EndSample(BufferName);
+		ExecuteBuffer();
+	}
+	
+	void RenderSpotShadow(int index, int split, int tileSize) {
+		ShadowedPunctualLight light = shadowedPunctualLights[index];
+		ShadowDrawingSettings shadowDrawingSettings = new ShadowDrawingSettings(
+			cullingResults, light.VisibleLightIndex,
+			BatchCullingProjectionType.Perspective
+		);
+		cullingResults.ComputeSpotShadowMatricesAndCullingPrimitives(
+			light.VisibleLightIndex, 
+			out Matrix4x4 viewMatrix,
+			out Matrix4x4 projectionMatrix, 
+			out ShadowSplitData splitData
+		);
+		shadowDrawingSettings.splitData = splitData;
+		float texelSize = 2f / (tileSize * projectionMatrix.m00);
+		float filterSize = texelSize * ((float)shadowSettings.punctual.filter + 1f);
+		float bias = light.NormalBias * filterSize * 1.4142136f;
+		Vector2 offset = SetTileViewport(index, split, tileSize);
+		float tileScale = 1f / split;
+		SetPunctualTileData(index, offset,tileScale, bias);
+		
+		PunctualShadowMatrices[index] = ConvertToAtlasMatrix(
+			projectionMatrix * viewMatrix,
+			offset, 
+			tileScale
+		);
+		buffer.SetViewProjectionMatrices(viewMatrix, projectionMatrix);
+		buffer.SetGlobalDepthBias(0f, light.SlopeScaleBias);
+		ExecuteBuffer();
+		context.DrawShadows(ref shadowDrawingSettings);
+		buffer.SetGlobalDepthBias(0f, 0f);
+	}
+	
+	void RenderPointShadow (int index, int split, int tileSize) {
+		ShadowedPunctualLight light = shadowedPunctualLights[index];
+		ShadowDrawingSettings shadowDrawingSettings= new ShadowDrawingSettings(
+			cullingResults, light.VisibleLightIndex,
+			BatchCullingProjectionType.Perspective
+		);
+		
+		float texelSize = 2f / tileSize;
+		float filterSize = texelSize * ((float)shadowSettings.punctual.filter + 1f);
+		float bias = light.NormalBias * filterSize * 1.4142136f;
+		float tileScale = 1f / split;
+		float fovBias = Mathf.Atan(1f + bias + filterSize) * Mathf.Rad2Deg * 2f - 90f;
+		
+		for (int i = 0; i < 6; i++) {
+			cullingResults.ComputePointShadowMatricesAndCullingPrimitives(
+				light.VisibleLightIndex, 
+				(CubemapFace)i, 
+				fovBias,
+				out Matrix4x4 viewMatrix, 
+				out Matrix4x4 projectionMatrix,
+				out ShadowSplitData splitData
+			);
+			
+			shadowDrawingSettings.splitData = splitData;
+			int tileIndex = index + i;
+			Vector2 offset = SetTileViewport(tileIndex, split, tileSize);
+			SetPunctualTileData(tileIndex, offset, tileScale, bias);
+			PunctualShadowMatrices[tileIndex] = ConvertToAtlasMatrix(
+				projectionMatrix * viewMatrix, 
+				offset, 
+				tileScale);
+
 			buffer.SetViewProjectionMatrices(viewMatrix, projectionMatrix);
 			buffer.SetGlobalDepthBias(0f, light.SlopeScaleBias);
 			ExecuteBuffer();

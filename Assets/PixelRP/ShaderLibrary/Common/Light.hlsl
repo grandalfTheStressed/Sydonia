@@ -26,7 +26,6 @@ struct Light {
 	float3 color;
 	float3 direction;
 	float attenuation;
-	float shadowAttenuation;
 };
 
 int GetDirectionalLightCount () {
@@ -38,16 +37,16 @@ DirectionalShadowData GetDirectionalShadowData (int lightIndex, ShadowData shado
 	data.strength = _DirectionalLightShadowData[lightIndex].x * shadowData.strength;
 	data.tileIndex = _DirectionalLightShadowData[lightIndex].y + shadowData.cascadeIndex;
 	data.normalBias = _DirectionalLightShadowData[lightIndex].z;
+	data.castShadows = data.strength > 0.0;
 	return data;
 }
 
-Light GetDirectionalLight (int index, Surface surface, ShadowData shadowData) {
+Light GetDirectionalLight (int index, Surface surface, ShadowData global) {
 	Light light;
 	light.color = _DirectionalLightColors[index].rgb;
 	light.direction = _DirectionalLightDirections[index].xyz;
-	DirectionalShadowData dirShadowData = GetDirectionalShadowData(index, shadowData);
-	light.attenuation = 1;
-	light.shadowAttenuation = GetDirectionalShadowAttenuation(dirShadowData, shadowData, surface);
+	DirectionalShadowData dirShadowData = GetDirectionalShadowData(index, global);
+	light.attenuation = GetDirectionalShadowAttenuation(dirShadowData, global, surface);
 	return light;
 }
 
@@ -55,19 +54,40 @@ int GetPunctualLightCount () {
 	return _PunctualLightCount;
 }
 
-Light GetPunctualLight (int index, Surface surface) {
+PunctualShadowData GetPunctualShadowData (int lightIndex) {
+	PunctualShadowData data;
+	data.strength = _PunctualLightShadowData[lightIndex].x;
+	data.tileIndex = _PunctualLightShadowData[lightIndex].y;
+	data.castShadows = _PunctualLightShadowData[lightIndex].x > 0.0;
+	data.isPoint = _PunctualLightShadowData[lightIndex].z == 1.0;
+	data.lightPosition = 0.0;
+	data.lightDirection = 0.0;
+	data.spotDirection = 0.0;
+	return data;
+}
+
+Light GetPunctualLight (int index, Surface surface, ShadowData global) {
 	Light light;
 	light.color = _PunctualLightColors[index].rgb;
 	float3 position = _PunctualLightPositions[index].xyz;
 	float3 ray = position - surface.position;
+	
 	light.direction = normalize(ray);
 	float distanceSqr = max(dot(ray, ray), 0.00001);
-	float rangeAttenuation = Square(saturate(1.0 - Square(distanceSqr * _PunctualLightPositions[index].w)));
 	float4 spotAngles = _PunctualLightSpotAngles[index];
 	float3 spotDirection = _PunctualLightDirections[index].xyz;
-	float spotAttenuation = Square(saturate(dot(spotDirection, light.direction) *spotAngles.x + spotAngles.y));
-	light.attenuation = spotAttenuation * rangeAttenuation / distanceSqr;
-	light.shadowAttenuation = 1;
+	
+	PunctualShadowData punctualShadowData = GetPunctualShadowData(index);
+	punctualShadowData.lightPosition = position;
+	punctualShadowData.lightDirection = light.direction;
+	punctualShadowData.spotDirection = spotDirection;
+	
+	float shadowAttenuation = GetPunctualShadowAttenuation(punctualShadowData, global, surface);
+	float rangeAttenuation = Square(saturate(1.0 - Square(distanceSqr * _PunctualLightPositions[index].w)));
+	float spotAttenuation = Square(saturate(dot(spotDirection, light.direction) * spotAngles.x + spotAngles.y));
+
+	light.attenuation = shadowAttenuation * spotAttenuation * rangeAttenuation / distanceSqr;
+	
 	return light;
 }
 #endif

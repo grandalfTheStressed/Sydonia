@@ -4,20 +4,33 @@
 #include "./ToonShading.hlsl"
 #include "./Light.hlsl"
 
-float3 GetLighting(Surface surface, Light light) {
+Reflectance GetLighting(Surface surface, Light light) {
 	return TBR(surface, light);
 }
 
 float3 GetLighting(Surface s) {
 	ShadowData sd = GetShadowData(s);
-	float3 color = 0.0;
+
+	Reflectance reflectance;
+	reflectance.diffuse = 0;
+	reflectance.specular = 0;
+
+	Reflectance temp;
+	
 	for (int i = 0; i < GetDirectionalLightCount(); i++) {
-		color += GetLighting(s, GetDirectionalLight(i, s, sd));
+		temp = GetLighting(s, GetDirectionalLight(i, s, sd));
+		reflectance.diffuse += temp.diffuse;
+		reflectance.specular += temp.specular;
 	}
 	for(int i = 0; i < GetPunctualLightCount(); i++)
 	{
-		color += GetLighting(s, GetPunctualLight(i, s));
+		temp = GetLighting(s, GetPunctualLight(i, s, sd));
+		reflectance.diffuse += temp.diffuse;
+		reflectance.specular += temp.specular;
 	}
-	return color;
+
+	reflectance.diffuse = max(reflectance.diffuse, s.albedo * .05) * s.albedo;
+	
+	return (reflectance.diffuse + reflectance.specular + s.emission).rgb;
 }
 #endif

@@ -20,6 +20,12 @@ public class ShadowSettings
         PCF7x7 
     }
 
+    [Min(0f)]
+    public float jitter = .0001f;
+
+    [Min(0f)]
+    public float noiseOffset = .0001f;
+    
     [Min(0.001f)]
     public float maxDistance = 100f;
 

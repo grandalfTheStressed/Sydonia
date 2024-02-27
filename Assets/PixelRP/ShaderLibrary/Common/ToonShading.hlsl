@@ -4,6 +4,12 @@
 #include "../Common/Surface.hlsl"
 #include "./Light.hlsl"
 
+struct Reflectance
+{
+    float3 diffuse;
+    float3 specular;
+};
+
 float3 GetIncomingLightDirection(Light light)
 {
     return normalize(light.direction);
@@ -11,9 +17,7 @@ float3 GetIncomingLightDirection(Light light)
 
 float GetLumenocity(Light light, float NdotL)
 {
-    //hiding gross self shadows
-    float lumenocity = NdotL * light.attenuation * light.shadowAttenuation;
-    lumenocity += (1 - lumenocity) * .03;
+    float lumenocity = NdotL * light.attenuation;
     return lumenocity;
 }
 
@@ -33,27 +37,30 @@ float3 Specular(Surface surface, float RdotV, float lumenocity)
     return pow(RdotV, surface.shininess) * surface.specularEdge * lumenocity;
 }
 
-float3 TBR(Surface surface, Light light)
+Reflectance TBR(Surface surface, Light light)
 {
     const float3 lightDir = GetIncomingLightDirection(light);
-    const float NdotL = Qdot(surface.normal, lightDir) > 0 ? 1 : 0;
+    
+    const float NdotL = Quantize(Qdot(surface.normal, lightDir), .25);
+    
     const float3 reflection = reflect(-lightDir, surface.normal);
+    const float RdotV = Qdot(reflection, surface.viewDirection);
+    
     const float lumenocity = GetLumenocity(light, NdotL);
     const float3 radiance = GetRadiance(light, lumenocity);
-    const float NdotV = Qdot(surface.normal, surface.viewDirection);
-    const float RdotV = Qdot(reflection, surface.viewDirection);
+    
 
-    float3 diffuse = radiance * surface.albedo;
-    float3 specular = surface.specularOffset * 2 * Quantize(Specular(surface, RdotV, lumenocity), .2);
-    specular = smoothstep(0.005, 0.01, specular) ;
+    float3 diffuse = radiance;
+    float3 specular = Quantize(Specular(surface, RdotV, lumenocity), .2);
+    specular = smoothstep(0.005, 0.01, specular);
+    specular *= surface.specularOffset; 
+    float3 rimLight = RimLight(surface, surface.NdotV);
+    specular = max(specular, rimLight) * (radiance * 4);
+    specular = min(specular, lumenocity);
     
-    float3 rimLight = RimLight(surface, NdotV);
-    
-    float3 reflectance = diffuse + max(specular, rimLight);
-    
-    #if defined(_PREMULTIPLY_ALPHA)
-	reflectance *= surface.alpha;
-    #endif
+    Reflectance reflectance;
+    reflectance.diffuse = diffuse;
+    reflectance.specular = specular;
     
     return reflectance;
 } 

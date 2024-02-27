@@ -8,7 +8,8 @@ partial class CameraRenderer
     partial void DrawGizmosBeforeFX();
 
     partial void DrawGizmosAfterFX();
-	
+
+    partial void DrawGBufferChannels();
     partial void DrawUnsupportedShaders();
     
     partial void DrawGizmos ();
@@ -32,6 +33,15 @@ partial class CameraRenderer
 
     private string SampleName
     { get; set; }
+
+    partial void DrawGBufferChannels() {
+        buffer.Blit(_albedo, _geometry);
+        buffer.Blit(_normal, _geometry);
+        buffer.Blit(_position, _geometry);
+        buffer.Blit(_offset, _geometry);
+        buffer.Blit(_edge, _geometry);
+        buffer.Blit(_highlights, _geometry);
+    }
         
     partial void DrawUnsupportedShaders()
     {

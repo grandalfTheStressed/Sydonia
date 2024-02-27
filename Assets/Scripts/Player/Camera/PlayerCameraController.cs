@@ -7,9 +7,10 @@ public class PlayerCameraController {
     private Input input;
 
     private float rotationSensitivity = 5f;
+    private float cameraAnimationSpeed = 0;
 
     private Quaternion targetRotation;
-    private float targetOrthoSize;
+    private int targetOrthoSize;
 
     private Vector3 flattenedForward = Vector3.forward;
 
@@ -18,11 +19,12 @@ public class PlayerCameraController {
     public PlayerCameraController(Camera playerCamera, Input input) {
         this.playerCamera = playerCamera;
         this.input = input;
-        targetOrthoSize = playerCamera.orthographicSize;
+        targetOrthoSize = (int)playerCamera.orthographicSize;
         targetRotation = this.playerCamera.transform.rotation;
     }
     
     public void UpdateCamera(Vector3 focus, bool isTargeting) {
+        cameraAnimationSpeed = cameraMovementCurve.Evaluate(Time.deltaTime) * 11f;
         CalcFlattenedForward();
         UpdateCameraPosition(focus);
         UpdateCameraRotation(isTargeting);
@@ -40,16 +42,27 @@ public class PlayerCameraController {
             Vector3.Lerp(
                 playerCamera.transform.position, 
                 focus + Vector3.up * (2 * (1 - targetRotation.eulerAngles.x / 70)), 
-                cameraMovementCurve.Evaluate(Time.deltaTime) * (22 / targetOrthoSize));
+                cameraAnimationSpeed);
     }
 
     private void UpdateCameraZoom() {
-        targetOrthoSize -= input.GetCameraZoomInput().y * 4;
-        targetOrthoSize = Math.Clamp(targetOrthoSize, 2, 22);
+        float zoom = input.GetCameraZoomInput().y * 2;
+        int unclampedOrthoSize = (int)(targetOrthoSize - zoom);
+        int clampedOrthoSize = Math.Clamp(unclampedOrthoSize, 2, 22);
         
-        playerCamera.orthographicSize = Mathf.Lerp(playerCamera.orthographicSize, 
+        if (unclampedOrthoSize != clampedOrthoSize) return;
+
+        targetOrthoSize = clampedOrthoSize;
+
+        float cameraOrthographicSize = playerCamera.orthographicSize;
+        playerCamera.orthographicSize = Mathf.Lerp(cameraOrthographicSize, 
             targetOrthoSize,
-            cameraMovementCurve.Evaluate(Time.deltaTime) * (22 / targetOrthoSize));
+            cameraAnimationSpeed * Mathf.Abs(targetOrthoSize - cameraOrthographicSize));
+        
+        targetRotation = Quaternion.Euler(
+            Mathf.Clamp(targetRotation.eulerAngles.x - zoom, targetOrthoSize + 10, 70),
+            targetRotation.eulerAngles.y,
+            0);
     }
 
     private void UpdateCameraRotation(bool isTargeting) {
@@ -57,13 +70,13 @@ public class PlayerCameraController {
         
         Vector2 cameraRotInput = input.GetCameraRotationInput();
         targetRotation = Quaternion.Euler(
-            Mathf.Clamp(targetRotation.eulerAngles.x - cameraRotInput.y * rotationStrength * Time.deltaTime, targetOrthoSize, 70), 
+            targetRotation.eulerAngles.x, 
             targetRotation.eulerAngles.y + cameraRotInput.x * rotationStrength * Time.deltaTime,
             0);
         
         playerCamera.transform.rotation = Quaternion.Lerp(
             playerCamera.transform.rotation,
             targetRotation,
-            Time.deltaTime * 10);
+            Time.deltaTime * cameraAnimationSpeed * 1000);
     }
 }

@@ -10,61 +10,58 @@ SAMPLER(_Normal);
 SAMPLER(_Position);
 SAMPLER(_Offset);
 SAMPLER(_Edge);
+SAMPLER(_Highlights);
+
+float4 _Albedo_TexelSize;
 
 struct Attributes {
 	float3 positionOS : POSITION;
-	float2 albedoUV : TEXCOORD0;
-	float2 normalUV : TEXCOORD1;
-	float2 positionUV : TEXCOORD2;
-	float2 offsetUV : TEXCOORD3;
-	float2 edgeUV : TEXCOORD4;
+	float2 baseUV : TEXCOORD0;
 };
 
 struct Interpolates {
 	float4 positionCS : SV_POSITION;
-	float2 albedoUV : VAR_ALBEDO_UV;
-	float2 normalUV : VAR_NORMAL_UV;
-	float2 positionUV: VAR_POSITION_UV;
-	float2 offsetUV : VAR_OFFSET_UV;
-	float2 edgeUV: VAR_EDGE_UV;
+	float2 baseUV : VAR_BASE_UV;
 };
 
 Interpolates DeferredPassVertex(Attributes input) {
 	Interpolates output;
 	float3 positionWS = TransformObjectToWorld(input.positionOS);
 	output.positionCS = TransformWorldToHClip(positionWS);
-	output.albedoUV = input.albedoUV;
-	output.normalUV = input.normalUV;
-	output.positionUV = input.positionUV;
-	output.offsetUV = input.offsetUV;
-	output.edgeUV = input.edgeUV;
+	output.baseUV = input.baseUV;
 	return output;
 }
 float4 DeferredPassFragment(Interpolates input) : SV_TARGET {
-	float4 albedoFrag = tex2D(_Albedo, input.albedoUV);
-	float4 normalFrag = tex2D(_Normal, input.normalUV);
-	float4 positionFrag = tex2D(_Position, input.positionUV);
-	float4 offsetFrag = tex2D(_Offset, input.offsetUV);
-	float4 edgeFrag = tex2D(_Edge, input.edgeUV);
+	GBuffer buffer;
+	buffer.kernelUVs = input.baseUV;
+	buffer.texelSize = _Albedo_TexelSize;
+	buffer.albedo = _Albedo;
+	buffer.normal = _Normal;
+	buffer.position = _Position;
+	buffer.offset = _Offset;
+	buffer.edge = _Edge;
+	buffer.highlights = _Highlights;
+	
+	float4 albedoFrag = tex2D(_Albedo, input.baseUV);
+	float4 normalFrag = tex2D(_Normal, input.baseUV);
+	float4 positionFrag = tex2D(_Position, input.baseUV);
+	float4 offsetFrag = tex2D(_Offset, input.baseUV);
+	float4 edgeFrag = tex2D(_Edge, input.baseUV);
+	float4 highlightsFrag = tex2D(_Highlights, input.baseUV);
 
 	Surface surface;
 	surface.position = positionFrag.xyz;
 	surface.normal = normalFrag.xyz;
-	
-	if(unity_OrthoParams.w)
-	{
-		surface.viewDirection = -_camera_forward;
-	}
-	else
-	{
-		surface.viewDirection = normalize(_WorldSpaceCameraPos - surface.position);
-	}
 
-	surface.depth = -TransformWorldToView(surface.position).z;
+	surface.viewDirection = IsOrthographicCamera() ?
+		-_camera_forward : normalize(_WorldSpaceCameraPos - surface.position);
+
+	surface.NdotV = Qdot(surface.normal, surface.viewDirection);
+	
+	surface.depth = positionFrag.a;
 	
 	surface.albedo = albedoFrag.rgb;
-	surface.alpha = 1;
-	//surface.emission = albedoFrag.a;
+	surface.alpha = albedoFrag.a;
 	
 	surface.rimEdge = edgeFrag.r;
 	surface.rimOffset = offsetFrag.r;
@@ -78,7 +75,16 @@ float4 DeferredPassFragment(Interpolates input) : SV_TARGET {
 	surface.shininess = offsetFrag.a;
 	surface.dither = edgeFrag.a;
 	
+	surface.emission = highlightsFrag.a;
+
 	float3 color = GetLighting(surface);
+
+	Edges edges = EdgeDetection(buffer, surface.NdotV);
+
+	color = edges.depthEdge == 0 ? color : color * highlightsFrag.g;
+	color = edges.normalEdge == 0 ? color : color * highlightsFrag.b;
+
+	//color = surface.NdotV;
 	return float4(color, albedoFrag.a);
 }
 #endif

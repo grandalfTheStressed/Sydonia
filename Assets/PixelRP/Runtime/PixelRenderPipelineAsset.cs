@@ -18,6 +18,7 @@ public class PixelRenderPipelineAsset : RenderPipelineAsset {
         pixelRenderPipeline = new PixelRenderPipeline();
         GraphicsSettings.useScriptableRenderPipelineBatching = srpBatching;
         GraphicsSettings.lightsUseLinearIntensity = true;
+        GraphicsSettings.lightsUseColorTemperature = true;
         pixelRenderPipeline.DynamicBatching = dynamicBatching;
         pixelRenderPipeline.Instancing = instancing;
         pixelRenderPipeline.ShadowSettings = shadowSettings;

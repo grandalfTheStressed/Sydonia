@@ -82,11 +82,11 @@ Material:
     - _Clipping: 0
     - _Cutoff: 0
     - _DetailNormalMapScale: 1
-    - _DiffuseEdge: 0.678
+    - _DiffuseEdge: 0.603
     - _DiffuseOffset: 0.464
     - _DistanceAttenuationEdge: 0.216
     - _DstBlend: 0
-    - _Emission: 0.39
+    - _Emission: 0
     - _FresnelThreshold: 3.7
     - _GlossMapScale: 1
     - _Glossiness: 0.5
@@ -96,23 +96,23 @@ Material:
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _PremulAlpha: 0
-    - _RimEdge: 0.648
-    - _RimOffset: 0.294
+    - _RimEdge: 0.802
+    - _RimOffset: 0.62
     - _RimThreshold: 0
     - _Roughness: 0
     - _ShadingOffset: 0.327
     - _ShadingResolution: 32.4
-    - _Smoothness: 0.72
+    - _Smoothness: 0.575
     - _SmoothnessTextureChannel: 0
     - _SpecularEdge: 0.58
     - _SpecularHighlights: 1
-    - _SpecularOffset: 0.7
+    - _SpecularOffset: 0
     - _SrcBlend: 1
     - _TintBenDay: 1
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
-    - _BaseColor: {r: 1, g: 0.6841278, b: 0, a: 1}
+    - _BaseColor: {r: 1, g: 0.68235296, b: 0, a: 1}
     - _BenDayTint: {r: 0, g: 0, b: 0, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}

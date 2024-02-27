@@ -96,7 +96,7 @@ Material:
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _PremulAlpha: 0
-    - _RimEdge: 0.791
+    - _RimEdge: 0.974
     - _RimOffset: 1
     - _RimThreshold: 0
     - _Roughness: 0.952

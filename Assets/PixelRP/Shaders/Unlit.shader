@@ -13,7 +13,6 @@ Shader "Pixel RP/Unlit" {
 	}
 	
 	SubShader {
-		
 		Pass
 		{
 			Blend [_SrcBlend] [_DstBlend]

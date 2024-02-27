@@ -20,6 +20,7 @@ public partial class CameraRenderer {
     private static int _position = Shader.PropertyToID("_Position");
     private static int _offset = Shader.PropertyToID("_Offset");
     private static int _edge = Shader.PropertyToID("_Edge");
+    private static int _highlights = Shader.PropertyToID("_Highlights");
 
     private static int _cameraForward = Shader.PropertyToID("_camera_forward");
     
@@ -44,6 +45,8 @@ public partial class CameraRenderer {
         
         this.context = context;
         this.camera = camera;
+
+        camera.depthTextureMode = DepthTextureMode.Depth;
 
         PrepareBuffer();
         PrepareForSceneWindow();
@@ -79,7 +82,10 @@ public partial class CameraRenderer {
         drawingSettings = new DrawingSettings {
             enableDynamicBatching = dynamicBatching,
             enableInstancing = instancing,
-            sortingSettings = sortingSettings
+            sortingSettings = sortingSettings,
+            perObjectData = PerObjectData.Lightmaps | 
+                            PerObjectData.LightProbe |
+                            PerObjectData.LightProbeProxyVolume
         };
 
         CameraClearFlags flags = camera.clearFlags;
@@ -91,15 +97,18 @@ public partial class CameraRenderer {
         buffer.ClearRenderTarget(clearDepth, clearColor, backGroundColor);
 
         SetupRenderTexture(ref _geometry, false, 24, RenderTextureFormat.ARGB32);
+        buffer.SetRenderTarget(_geometry, RenderBufferLoadAction.DontCare, RenderBufferStoreAction.Store);
         buffer.ClearRenderTarget(clearDepth, clearColor, backGroundColor);
         
         SetupRenderTexture(ref _fx, false, 0, RenderTextureFormat.ARGBFloat);
+        buffer.SetRenderTarget(_fx, RenderBufferLoadAction.DontCare, RenderBufferStoreAction.Store);
         buffer.ClearRenderTarget(clearDepth, clearColor, Color.clear);
         
         SetupRenderTexture(ref _normal, false, 0, RenderTextureFormat.ARGBFloat);
         SetupRenderTexture(ref _position, false, 0, RenderTextureFormat.ARGBFloat);
         SetupRenderTexture(ref _offset, false, 0, RenderTextureFormat.ARGBFloat);
         SetupRenderTexture(ref _edge, false, 0, RenderTextureFormat.ARGBFloat);
+        SetupRenderTexture(ref _highlights, false, 0, RenderTextureFormat.ARGBHalf);
         SetupRenderTexture(ref _albedo, false, 0, RenderTextureFormat.ARGB32);
         SetupGeometryBuffer();
         buffer.ClearRenderTarget(clearDepth, clearColor, backGroundColor);
@@ -126,9 +135,12 @@ public partial class CameraRenderer {
         
         drawingSettings.SetShaderPassName(0, _geometryShaderTagId);
         sortingSettings.criteria = SortingCriteria.CommonOpaque;
+        drawingSettings.sortingSettings = sortingSettings;
         FilteringSettings filteringSettings = new FilteringSettings(RenderQueueRange.all);
         context.DrawRenderers(cullingResults, ref drawingSettings, ref filteringSettings);
         drawingSettings.SetShaderPassName(0, ShaderTagId.none);
+        
+        DrawGBufferChannels();
         
         buffer.Blit(_albedo, _geometry, deferredMaterial, 1);
         buffer.EndSample(SampleName);
@@ -142,12 +154,14 @@ public partial class CameraRenderer {
         drawingSettings.SetShaderPassName(1, _defaultShaderTagId);
         
         sortingSettings.criteria = SortingCriteria.CommonOpaque;
+        drawingSettings.sortingSettings = sortingSettings;
         FilteringSettings filteringSettings = new FilteringSettings(RenderQueueRange.opaque);
         context.DrawRenderers(cullingResults, ref drawingSettings, ref filteringSettings);
         
         context.DrawSkybox(camera);
         
         sortingSettings.criteria = SortingCriteria.CommonTransparent;
+        drawingSettings.sortingSettings = sortingSettings;
         filteringSettings.renderQueueRange = RenderQueueRange.transparent;
         context.DrawRenderers(cullingResults, ref drawingSettings, ref filteringSettings);
 
@@ -164,7 +178,8 @@ public partial class CameraRenderer {
             _normal,
             _position,
             _offset,
-            _edge
+            _edge,
+            _highlights
         };
         
         buffer.SetRenderTarget(geometryBuffer, _geometry);
@@ -185,8 +200,6 @@ public partial class CameraRenderer {
             format, 
             RenderTextureReadWrite.Default,
             antiAliasing ? QualitySettings.antiAliasing : 1);
-        
-        buffer.SetRenderTarget(renderTextureId, RenderBufferLoadAction.DontCare, RenderBufferStoreAction.Store);
     }
 
     private void Submit () {
