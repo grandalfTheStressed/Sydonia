@@ -13,6 +13,7 @@ Material:
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords:
+  - _HIGHLIGHTS_ON
   - _TINTBENDAY
   - _TINT_SHADING
   m_LightmapFlags: 4
@@ -98,37 +99,42 @@ Material:
     - _Clipping: 0
     - _Cutoff: 0
     - _DetailNormalMapScale: 1
-    - _DiffuseEdge: 0.422
-    - _DiffuseOffset: 0.422
+    - _DiffuseEdge: 0
+    - _DiffuseOffset: 0
     - _DistanceAttenuationEdge: 0
     - _DstBlend: 0
+    - _EdgeId: 944122
     - _Emission: 0
     - _FresnelThreshold: 3.7
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
+    - _HighlightBrights: 7.48
+    - _HighlightDarks: 1
+    - _HighlightEdge: 0
+    - _Highlights: 0
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _PremulAlpha: 0
-    - _RimEdge: 1
-    - _RimOffset: 0.5
+    - _RimEdge: 0
+    - _RimOffset: 0
     - _RimThreshold: 0
     - _Roughness: 0.275
     - _ShadingOffset: 0.845
     - _ShadingResolution: 36.5
-    - _Smoothness: 0.5
+    - _Smoothness: 0
     - _SmoothnessTextureChannel: 0
-    - _SpecularEdge: 0.118
+    - _SpecularEdge: 0
     - _SpecularHighlights: 1
-    - _SpecularOffset: 0.613
+    - _SpecularOffset: 0
     - _SrcBlend: 1
     - _TintBenDay: 1
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
-    - _BaseColor: {r: 0.6037736, g: 0.4433369, b: 0.41865435, a: 1}
+    - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _BenDayTint: {r: 0, g: 0, b: 0, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}

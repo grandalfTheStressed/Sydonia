@@ -42,9 +42,6 @@ float4 LitPassFragment(Interpolates input) : SV_TARGET {
 	
 	surface.rimEdge = GetRimEdge();
 	surface.rimOffset = GetRimOffset();
-	
-	surface.diffuseEdge = GetDiffuseEdge();
-	surface.diffuseOffset = GetDiffuseOffset();
 
 	surface.specularEdge = GetSpecularEdge() / 2;
 	surface.specularOffset = GetSpecularOffset() * 2;

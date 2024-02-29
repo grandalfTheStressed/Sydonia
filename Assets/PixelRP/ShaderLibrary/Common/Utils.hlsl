@@ -26,18 +26,6 @@ SAMPLER(sampler_point_clamp);
 
 float4 _camera_forward;
 
-struct GBuffer
-{
-    float2 kernelUVs;
-    float texelSize;
-    sampler albedo;
-    sampler normal;
-    sampler position;
-    sampler offset;
-    sampler edge;
-    sampler highlights;
-};
-
 bool IsOrthographicCamera () {
     return unity_OrthoParams.w;
 }
@@ -59,48 +47,69 @@ float InvLerp(float a, float b, float v)
     return (v - a) / (b - a);
 }
 
+float Qdot(float3 v1, float3 v2) {
+    return saturate(dot(v1, v2));
+}
+
+float Square (float x) {
+    return x * x;
+}
+
+float DistanceSquared(float3 pA, float3 pB) {
+    return dot(pA - pB, pA - pB);
+}
+
+float Distance(float3 pA, float3 pB) {
+    return sqrt(DistanceSquared(pA, pB));
+}
+
+struct GBuffer
+{
+    float2 kernelUVs;
+    float texelSize;
+    sampler albedo;
+    sampler normal;
+    sampler position;
+    sampler offset;
+    sampler edge;
+    sampler highlights;
+};
+
 struct Edges
 {
-    float depthEdge;
+    float IdEdge;
     float normalEdge;
 };
 
-Edges EdgeDetection(GBuffer buffer, float NdotV)
+Edges EdgeDetection(GBuffer buffer)
 {
     const float kernel[3][3] = {
         {-1, -1, -1},
-        {-1,  8, -1},
+        {-1, +8, -1},
         {-1, -1, -1}
     };
 
     float2 pixelUVs;
     float3 normalGradient = 0.0;
+    float MaterialIdGradient = 0.0;
     float depthGradient = 0.0;
 
     for(int i = -1; i <= 1; i++) {
         for(int j = -1; j <= 1; j++) {
             pixelUVs = buffer.kernelUVs + buffer.texelSize * float2(i, j);
-        
-            const float3 sampledNormal = tex2D(buffer.normal, pixelUVs).rgb;
-            const float sampledDepth = tex2D(buffer.position, pixelUVs).a;
-
-            normalGradient += sampledNormal * kernel[i + 1][j + 1];
-            depthGradient += sampledDepth * kernel[i + 1][j + 1];
+            MaterialIdGradient += tex2D(buffer.normal, pixelUVs).a * kernel[i + 1][j + 1];
+            depthGradient += tex2D(buffer.position, pixelUVs).a * kernel[i + 1][j + 1];
+            normalGradient += tex2D(buffer.normal, pixelUVs).rgb * kernel[i + 1][j + 1];
         }
     }
 
-    float3 normalGradientMagnitude = normalGradient;
-    float depthGradientMagnitude = depthGradient;
-    
-    float depth = depthGradientMagnitude;
-    depth = InvLerp(.001, .050, depth) < 1 ? 0 : 1;
-
-    float normal = max(max(normalGradientMagnitude.r, normalGradientMagnitude.g), normalGradientMagnitude.b);
-    normal = normal < 1 ? 0 : 1 * (1 - depth);
-    
+    float depth = step(-.20, (depthGradient));
+    float IdEdge = abs(-MaterialIdGradient) > 0 ? 1 : 0;
+    float normalCull = abs(MaterialIdGradient) > 0 ? 1 : 0;
+    float normal = length(normalGradient);
     Edges edges;
-    edges.normalEdge = normal;
-    edges.depthEdge = depth;
+    edges.normalEdge = normal * (1 - normalCull) < .5 ? 0 : 1;
+    edges.IdEdge = IdEdge - depth < 1 ? 0 : 1;
     
     return edges;
 }
@@ -127,22 +136,6 @@ float ApplyNoiseToEdges(float value, float stepSize, float dither) {
     float quantizedValue = Quantize(value, stepSize);
     
     return dither > .6 ? quantizedValue : value;
-}
-
-float Qdot(float3 v1, float3 v2) {
-    return saturate(dot(v1, v2));
-}
-
-float Square (float x) {
-    return x * x;
-}
-
-float DistanceSquared(float3 pA, float3 pB) {
-    return dot(pA - pB, pA - pB);
-}
-
-float Distance(float3 pA, float3 pB) {
-    return sqrt(DistanceSquared(pA, pB));
 }
 
 float3 DecodeNormal (float4 sample, float scale) {

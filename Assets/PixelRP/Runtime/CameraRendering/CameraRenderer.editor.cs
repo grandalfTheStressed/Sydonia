@@ -19,7 +19,7 @@ partial class CameraRenderer
     partial void PrepareBuffer();
     
 #if UNITY_EDITOR
-
+    
     private static ShaderTagId[] _legacyShaderTagIds = {
         new("Always"),
         new("ForwardBase"),

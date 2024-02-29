@@ -13,6 +13,8 @@ Material:
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords:
+  - _HIGHLIGHTEDGE
+  - _HIGHLIGHTS_ON
   - _TINTBENDAY
   - _TINT_SHADING
   m_LightmapFlags: 4
@@ -91,6 +93,10 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
+    - _HighlightBrights: 0
+    - _HighlightDarks: 0
+    - _HighlightEdge: 1
+    - _Highlights: 0
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1

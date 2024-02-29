@@ -16,9 +16,6 @@ Shader "Pixel RP/ForwardLit"
         _RimEdge("RimEdge", Range(0, 2)) = 0.5
         _RimOffset("RimOffset", Range(0, 1)) = 0.5
         
-        _DiffuseEdge("DiffuseEdge", Range(0, 1)) = 0.7
-        _DiffuseOffset("DiffuseOffset", Range(0, 1)) = 0.5
-        
         _SpecularEdge("SpecularEdge", Range(0, 1)) = 0.1
         _SpecularOffset("SpecularOffset", Range(0, 1)) = 0.1
     	

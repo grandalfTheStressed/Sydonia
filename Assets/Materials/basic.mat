@@ -12,7 +12,10 @@ Material:
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
-  m_InvalidKeywords: []
+  m_InvalidKeywords:
+  - _HIGHLIGHTEDGE
+  - _HIGHLIGHTS
+  - _HIGHLIGHTS_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
@@ -106,12 +109,17 @@ Material:
     - _DistanceAttenuationEdge: 0
     - _DstBlend: 0
     - _DstBlendAlpha: 0
-    - _Emission: 0.07
+    - _EdgeId: 184691
+    - _Emission: 0
     - _FresnelThreshold: 3.7
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossinessSource: 0
     - _GlossyReflections: 1
+    - _HighlightBrights: 10
+    - _HighlightDarks: 1
+    - _HighlightEdge: 1
+    - _Highlights: 1
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
@@ -140,7 +148,7 @@ Material:
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
-    - _BaseColor: {r: 0.54901963, g: 0.5019608, b: 0.4666667, a: 1}
+    - _BaseColor: {r: 0.8627451, g: 0.27450982, b: 0.27450982, a: 1}
     - _BenDayTint: {r: 0, g: 0, b: 0, a: 1}
     - _Color: {r: 1, g: 0.42959574, b: 0.0039215684, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}

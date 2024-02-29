@@ -14,6 +14,8 @@ Material:
   m_ValidKeywords: []
   m_InvalidKeywords:
   - _EMISSION
+  - _HIGHLIGHTEDGE
+  - _HIGHLIGHTS_ON
   - _SHADOWS_ON
   - _TINTBENDAY
   - _TINT_SHADING
@@ -110,13 +112,17 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
+    - _HighlightBrights: 0
+    - _HighlightDarks: 1
+    - _HighlightEdge: 1
+    - _Highlights: 0
     - _LightingEnabled: 1
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _PremulAlpha: 0
-    - _RimEdge: 0.818
+    - _RimEdge: 1
     - _RimOffset: 1
     - _RimThreshold: 0
     - _Roughness: 0.099

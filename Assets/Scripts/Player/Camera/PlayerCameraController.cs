@@ -1,4 +1,6 @@
 using System;
+using System.Xml.Linq;
+using Unity.Mathematics;
 using UnityEngine;
 
 public class PlayerCameraController {
@@ -9,16 +11,22 @@ public class PlayerCameraController {
     private float rotationSensitivity = 5f;
     private float cameraAnimationSpeed = 0;
 
+    private Quaternion _prevRotation;
+    private Vector3 _snapSpaceForward;
+    private Vector3 _snapSpaceUp;
+    
     private Quaternion targetRotation;
     private int targetOrthoSize;
+    private bool snapCameraToGrid;
 
     private Vector3 flattenedForward = Vector3.forward;
 
     public Vector3 FlattenedForward => flattenedForward;
 
-    public PlayerCameraController(Camera playerCamera, Input input) {
+    public PlayerCameraController(Camera playerCamera, Input input, bool snapCameraToGrid) {
         this.playerCamera = playerCamera;
         this.input = input;
+        this.snapCameraToGrid = snapCameraToGrid;
         targetOrthoSize = (int)playerCamera.orthographicSize;
         targetRotation = this.playerCamera.transform.rotation;
     }
@@ -38,11 +46,17 @@ public class PlayerCameraController {
     }
 
     private void UpdateCameraPosition(Vector3 focus) {
-        playerCamera.transform.position = 
-            Vector3.Lerp(
-                playerCamera.transform.position, 
-                focus + Vector3.up * (2 * (1 - targetRotation.eulerAngles.x / 70)), 
-                cameraAnimationSpeed);
+        playerCamera.transform.position = focus + Vector3.up * (2 * (1 - targetRotation.eulerAngles.x / 70));
+
+        if (!snapCameraToGrid) return;
+
+        Vector3 screenPoint = playerCamera.WorldToScreenPoint(playerCamera.transform.position);
+        
+
+        screenPoint.x = Mathf.RoundToInt(screenPoint.x);
+        screenPoint.y = Mathf.RoundToInt(screenPoint.y);
+
+        playerCamera.transform.position = playerCamera.ScreenToWorldPoint(screenPoint);
     }
 
     private void UpdateCameraZoom() {

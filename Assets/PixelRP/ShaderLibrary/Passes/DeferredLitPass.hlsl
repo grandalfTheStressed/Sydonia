@@ -52,9 +52,13 @@ float4 DeferredPassFragment(Interpolates input) : SV_TARGET {
 	Surface surface;
 	surface.position = positionFrag.xyz;
 	surface.normal = normalFrag.xyz;
-
+	
 	surface.viewDirection = IsOrthographicCamera() ?
 		-_camera_forward : normalize(_WorldSpaceCameraPos - surface.position);
+
+	float3 flattenedForward = _camera_forward;
+
+	float3 normalThreshold = normalize(flattenedForward);
 
 	surface.NdotV = Qdot(surface.normal, surface.viewDirection);
 	
@@ -66,9 +70,6 @@ float4 DeferredPassFragment(Interpolates input) : SV_TARGET {
 	surface.rimEdge = edgeFrag.r;
 	surface.rimOffset = offsetFrag.r;
 	
-	surface.diffuseEdge = edgeFrag.g;
-	surface.diffuseOffset = offsetFrag.g;
-
 	surface.specularEdge = edgeFrag.b;
 	surface.specularOffset = offsetFrag.b;
 
@@ -79,12 +80,10 @@ float4 DeferredPassFragment(Interpolates input) : SV_TARGET {
 
 	float3 color = GetLighting(surface);
 
-	Edges edges = EdgeDetection(buffer, surface.NdotV);
-
-	color = edges.depthEdge == 0 ? color : color * highlightsFrag.g;
-	color = edges.normalEdge == 0 ? color : color * highlightsFrag.b;
-
-	//color = surface.NdotV;
+	Edges edges = EdgeDetection(buffer);
+	
+	color = edges.normalEdge * highlightsFrag.r == 0 || !IsOrthographicCamera() ? color : color * 2;
+	color = edges.IdEdge == 0 || !IsOrthographicCamera() ? color : color * edges.IdEdge * .4;
 	return float4(color, albedoFrag.a);
 }
 #endif

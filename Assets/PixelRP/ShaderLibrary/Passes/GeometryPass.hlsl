@@ -7,8 +7,6 @@
 #include "../Common/BakedGI.hlsl"
 #include "../Common/LitInput.hlsl"
 
-float4x4 _CameraProjection;
-
 struct Fragments
 {
 	float4 albedo : SV_TARGET0;
@@ -40,17 +38,17 @@ Fragments GeometryPassFragment(Interpolates input) {
 	
 	Fragments frag;
 	frag.albedo = float4(base.rgb, 1);
-
-	frag.position = float4(input.positionWS, GetDepth(input.positionCS_SS));
-	frag.normal = float4(normalWS, 0);
+	float depth = GetDepth(input.positionCS_SS);
+	frag.position = float4(input.positionWS, depth);
+	frag.normal = float4(normalWS, GetEdgeId());
 	frag.offsets = float4(
 		GetRimOffset(),
-		GetDiffuseOffset(),
+		0,
 		GetSpecularOffset(),
 		exp2(10 * GetSmoothness() + 1));
 	frag.edges = float4(
 		GetRimEdge(),
-		GetDiffuseEdge(),
+		0,
 		GetSpecularEdge(),
 		InterleavedGradientNoise(input.positionCS_SS.xy, 0));
 	

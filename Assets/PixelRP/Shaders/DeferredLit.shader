@@ -7,15 +7,13 @@ Shader "Pixel RP/DeferredLit"
     	[Enum(Off, 0, On, 1)] _ZWrite("Z Write", Float) = 1
         _BaseColor("Color", Color) = (0.5, 0.5, 0.5, 1.0)
     	[Toggle(_HIGHLIGHTEDGE)] _HighlightEdge("HighlightEdge", Float) = 0
-    	_HighlightBrights("HighlightBrights", Range(0, 1)) = 0.0
+    	_EdgeId("EdgeId", Range(0, 400000)) = 0
+    	_HighlightBrights("HighlightBrights", Range(0, 10)) = 0.0
     	_HighlightDarks("HighlightDarks", Range(0, 1)) = 0.0
         _Emission("Emission", Range(0, 1)) = 0.0
         
         _RimEdge("RimEdge", Range(0, 1)) = 0.5
         _RimOffset("RimOffset", Range(0, 1)) = 0.5
-        
-        _DiffuseEdge("DiffuseEdge", Range(0, 1)) = 0.7
-        _DiffuseOffset("DiffuseOffset", Range(0, 1)) = 0.5
         
         _SpecularEdge("SpecularEdge", Range(0, 1)) = 0.1
         _SpecularOffset("SpecularOffset", Range(0, 1)) = 0.1

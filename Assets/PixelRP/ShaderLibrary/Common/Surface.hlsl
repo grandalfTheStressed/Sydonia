@@ -18,9 +18,6 @@ struct Surface {
 	float rimEdge;
 	float rimOffset;
 	
-	float diffuseEdge;
-	float diffuseOffset;
-	
 	float specularEdge;
 	float specularOffset;
 

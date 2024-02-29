@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float drag = 8f;
     [SerializeField] private Rigidbody rigidBody;
     [SerializeField] private Camera playerCamera;
+    [SerializeField] private bool snapCameraToGrid;
 
     private PlayerCameraController playerCameraController;
     private TargetTracker targetTracker;
@@ -20,7 +21,7 @@ public class PlayerController : MonoBehaviour
 
     public void Start()
     {
-        playerCameraController = new PlayerCameraController(playerCamera, input);
+        playerCameraController = new PlayerCameraController(playerCamera, input, snapCameraToGrid);
         targetTracker = GetComponentInChildren<TargetTracker>();
         rigidBody = GetComponent<Rigidbody>();
         rigidBody.freezeRotation = true;

@@ -18,11 +18,11 @@ public class DateUtils : MonoBehaviour
 
     public float Second => second;
     
-    public const int DayLength = 24;
+    public const int DayLength = 25;
     
-    public const int MonthLength = 28;
+    public const int MonthLength = 43;
 
-    public const int YearLength = 12;
+    public const int YearLength = 16;
 
     public float TimeOfDay => timeOfDay;
 

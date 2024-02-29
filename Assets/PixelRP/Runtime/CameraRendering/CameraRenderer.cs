@@ -41,12 +41,24 @@ public partial class CameraRenderer {
 
     private RenderTexture fxRenderTexture;
 
+    private static int _defaultRenderWidth = (int)(Screen.width * .8);
+    private static int _defaultRenderHeight = (int)(Screen.height * .8);
+
+    public static float DefaultRenderWidth => _defaultRenderWidth;
+
+    public static float DefaultRenderHeight => _defaultRenderHeight;
+    
+    
+
     public void Render(ScriptableRenderContext context, Camera camera, bool dynamicBatching, bool instancing, ShadowSettings shadowSettings) {
         
         this.context = context;
         this.camera = camera;
 
-        camera.depthTextureMode = DepthTextureMode.Depth;
+        if (!this.camera.orthographic) {
+            _defaultRenderWidth = Screen.width;
+            _defaultRenderHeight = Screen.height;
+        }
 
         PrepareBuffer();
         PrepareForSceneWindow();
@@ -63,7 +75,6 @@ public partial class CameraRenderer {
         DrawDeferredGeometry();
         DrawForwardGeometry();
         DrawGizmos();
-
         buffer.Blit(_geometry, BuiltinRenderTextureType.CameraTarget);
         CleanUp();
         Submit();
@@ -82,10 +93,7 @@ public partial class CameraRenderer {
         drawingSettings = new DrawingSettings {
             enableDynamicBatching = dynamicBatching,
             enableInstancing = instancing,
-            sortingSettings = sortingSettings,
-            perObjectData = PerObjectData.Lightmaps | 
-                            PerObjectData.LightProbe |
-                            PerObjectData.LightProbeProxyVolume
+            sortingSettings = sortingSettings
         };
 
         CameraClearFlags flags = camera.clearFlags;
@@ -143,6 +151,7 @@ public partial class CameraRenderer {
         DrawGBufferChannels();
         
         buffer.Blit(_albedo, _geometry, deferredMaterial, 1);
+        
         buffer.EndSample(SampleName);
     }
 
@@ -193,10 +202,29 @@ public partial class CameraRenderer {
         
         buffer.GetTemporaryRT(
             renderTextureId, 
-            Screen.width, 
-            Screen.height, 
+            _defaultRenderWidth, 
+            _defaultRenderHeight, 
             depth, 
-            FilterMode.Bilinear, 
+            FilterMode.Point, 
+            format, 
+            RenderTextureReadWrite.Default,
+            antiAliasing ? QualitySettings.antiAliasing : 1);
+    }
+    
+    private void SetupRenderTexture(
+        int width,
+        int height,
+        ref int renderTextureId,
+        bool antiAliasing, 
+        int depth, 
+        RenderTextureFormat format) {
+        
+        buffer.GetTemporaryRT(
+            renderTextureId, 
+            width, 
+            height, 
+            depth, 
+            FilterMode.Point, 
             format, 
             RenderTextureReadWrite.Default,
             antiAliasing ? QualitySettings.antiAliasing : 1);

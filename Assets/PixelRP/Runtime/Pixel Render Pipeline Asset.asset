@@ -16,8 +16,8 @@ MonoBehaviour:
   dynamicBatching: 1
   instancing: 1
   shadowSettings:
-    jitter: 0
-    noiseOffset: 0.001
+    jitter: 10
+    noiseOffset: 100
     maxDistance: 160
     distanceFade: 0.001
     directional:
@@ -27,7 +27,7 @@ MonoBehaviour:
       cascadeRatio1: 0.203
       cascadeRatio2: 0.368
       cascadeRatio3: 0.607
-      cascadeFade: 0.001
+      cascadeFade: 0.112
       cascadeBlend: 1
     punctual:
       atlasSize: 2048

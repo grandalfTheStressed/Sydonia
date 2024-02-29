@@ -18,14 +18,12 @@ UNITY_DEFINE_INSTANCED_PROP(float, _Emission)
 UNITY_DEFINE_INSTANCED_PROP(float, _RimEdge)
 UNITY_DEFINE_INSTANCED_PROP(float, _RimOffset)
 
-UNITY_DEFINE_INSTANCED_PROP(float, _DiffuseEdge)
-UNITY_DEFINE_INSTANCED_PROP(float, _DiffuseOffset)
-
 UNITY_DEFINE_INSTANCED_PROP(float, _SpecularEdge)
 UNITY_DEFINE_INSTANCED_PROP(float, _SpecularOffset)
 
 UNITY_DEFINE_INSTANCED_PROP(float, _Smoothness)
 
+UNITY_DEFINE_INSTANCED_PROP(float, _EdgeId)
 UNITY_DEFINE_INSTANCED_PROP(float, _HighlightEdge)
 UNITY_DEFINE_INSTANCED_PROP(float, _HighlightDarks)
 UNITY_DEFINE_INSTANCED_PROP(float, _HighlightBrights)
@@ -96,14 +94,6 @@ float GetRimOffset () {
 	return UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _RimOffset);
 }
 
-float GetDiffuseEdge () {
-	return UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _DiffuseEdge);
-}
-
-float GetDiffuseOffset () {
-	return UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _DiffuseOffset);
-}
-
 float GetSpecularEdge () {
 	return UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _SpecularEdge);
 }
@@ -114,6 +104,11 @@ float GetSpecularOffset () {
 
 float GetSmoothness () {
 	return UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Smoothness);
+}
+
+float GetEdgeId()
+{
+	return UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _EdgeId);
 }
 
 float GetHighlight()

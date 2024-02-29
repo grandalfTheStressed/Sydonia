@@ -13,6 +13,9 @@ Material:
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords:
+  - _HIGHLIGHTEDGE
+  - _HIGHLIGHTS
+  - _HIGHLIGHTS_ON
   - _SHADOWS_ON
   - _TINTBENDAY
   - _TINT_SHADING
@@ -87,18 +90,23 @@ Material:
     - _DiffuseOffset: 0.257
     - _DistanceAttenuationEdge: 0.058
     - _DstBlend: 0
-    - _Emission: 0.062
+    - _EdgeId: 205662
+    - _Emission: 0
     - _FresnelThreshold: 3.7
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
+    - _HighlightBrights: 2.17
+    - _HighlightDarks: 0
+    - _HighlightEdge: 1
+    - _Highlights: 1
     - _Metallic: 1
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _PremulAlpha: 0
     - _RimEdge: 0
-    - _RimOffset: 0.439
+    - _RimOffset: 0
     - _RimThreshold: 0
     - _Roughness: 0.263
     - _ShadingOffset: 0.248
@@ -106,7 +114,7 @@ Material:
     - _Shadows: 0
     - _Smoothness: 1
     - _SmoothnessTextureChannel: 0
-    - _SpecularEdge: 0.48
+    - _SpecularEdge: 0
     - _SpecularHighlights: 1
     - _SpecularOffset: 0
     - _SrcBlend: 1
@@ -114,7 +122,7 @@ Material:
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
-    - _BaseColor: {r: 0.2830189, g: 0.2830189, b: 0.2830189, a: 1}
+    - _BaseColor: {r: 0.8627451, g: 0.27450982, b: 0.27450982, a: 1}
     - _BenDayTint: {r: 0, g: 0, b: 0, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
