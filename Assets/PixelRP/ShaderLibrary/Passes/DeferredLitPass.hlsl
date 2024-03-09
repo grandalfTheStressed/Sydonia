@@ -32,8 +32,11 @@ Interpolates DeferredPassVertex(Attributes input) {
 	return output;
 }
 float4 DeferredPassFragment(Interpolates input) : SV_TARGET {
+	
+	float2 uv = input.baseUV;
+	
 	GBuffer buffer;
-	buffer.kernelUVs = input.baseUV;
+	buffer.kernelUVs = uv;
 	buffer.texelSize = _Albedo_TexelSize;
 	buffer.albedo = _Albedo;
 	buffer.normal = _Normal;
@@ -42,12 +45,12 @@ float4 DeferredPassFragment(Interpolates input) : SV_TARGET {
 	buffer.edge = _Edge;
 	buffer.highlights = _Highlights;
 	
-	float4 albedoFrag = tex2D(_Albedo, input.baseUV);
-	float4 normalFrag = tex2D(_Normal, input.baseUV);
-	float4 positionFrag = tex2D(_Position, input.baseUV);
-	float4 offsetFrag = tex2D(_Offset, input.baseUV);
-	float4 edgeFrag = tex2D(_Edge, input.baseUV);
-	float4 highlightsFrag = tex2D(_Highlights, input.baseUV);
+	float4 albedoFrag = tex2D(_Albedo, uv);
+	float4 normalFrag = tex2D(_Normal, uv);
+	float4 positionFrag = tex2D(_Position, uv);
+	float4 offsetFrag = tex2D(_Offset, uv);
+	float4 edgeFrag = tex2D(_Edge, uv);
+	float4 highlightsFrag = tex2D(_Highlights, uv);
 
 	Surface surface;
 	surface.position = positionFrag.xyz;
@@ -55,10 +58,6 @@ float4 DeferredPassFragment(Interpolates input) : SV_TARGET {
 	
 	surface.viewDirection = IsOrthographicCamera() ?
 		-_camera_forward : normalize(_WorldSpaceCameraPos - surface.position);
-
-	float3 flattenedForward = _camera_forward;
-
-	float3 normalThreshold = normalize(flattenedForward);
 
 	surface.NdotV = Qdot(surface.normal, surface.viewDirection);
 	
@@ -83,7 +82,7 @@ float4 DeferredPassFragment(Interpolates input) : SV_TARGET {
 	Edges edges = EdgeDetection(buffer);
 	
 	color = edges.normalEdge * highlightsFrag.r == 0 || !IsOrthographicCamera() ? color : color * 2;
-	color = edges.IdEdge == 0 || !IsOrthographicCamera() ? color : color * edges.IdEdge * .4;
+	color = edges.IdEdge == 0 || !IsOrthographicCamera() ? color : color * edges.IdEdge * .2;
 	return float4(color, albedoFrag.a);
 }
 #endif

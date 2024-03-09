@@ -18,16 +18,16 @@ MonoBehaviour:
   shadowSettings:
     jitter: 10
     noiseOffset: 100
-    maxDistance: 160
+    maxDistance: 60
     distanceFade: 0.001
     directional:
-      atlasSize: 2048
+      atlasSize: 8192
       filter: 3
-      cascadeCount: 4
+      cascadeCount: 1
       cascadeRatio1: 0.203
       cascadeRatio2: 0.368
       cascadeRatio3: 0.607
-      cascadeFade: 0.112
+      cascadeFade: 0.001
       cascadeBlend: 1
     punctual:
       atlasSize: 2048

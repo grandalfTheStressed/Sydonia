@@ -34,7 +34,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BaseMap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 10309, guid: 0000000000000000f000000000000000, type: 0}
         m_Scale: {x: 20, y: 20}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
@@ -104,7 +104,8 @@ Material:
     - _DistortionStrength: 1
     - _DistortionStrengthScaled: 0
     - _DstBlend: 0
-    - _Emission: 0.019
+    - _EdgeId: 0
+    - _Emission: 0
     - _EmissionEnabled: 0
     - _EnableExternalAlpha: 0
     - _FlipbookMode: 0
@@ -113,7 +114,7 @@ Material:
     - _Glossiness: 0.5
     - _GlossyReflections: 1
     - _HighlightBrights: 0
-    - _HighlightDarks: 1
+    - _HighlightDarks: 0
     - _HighlightEdge: 1
     - _Highlights: 0
     - _LightingEnabled: 1
@@ -122,21 +123,21 @@ Material:
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _PremulAlpha: 0
-    - _RimEdge: 1
-    - _RimOffset: 1
+    - _RimEdge: 0
+    - _RimOffset: 0
     - _RimThreshold: 0
     - _Roughness: 0.099
     - _ShadingOffset: 0.215
     - _ShadingResolution: 8.36
     - _Shadows: 0
-    - _Smoothness: 0.467
+    - _Smoothness: 0
     - _SmoothnessTextureChannel: 0
     - _SoftParticlesEnabled: 0
     - _SoftParticlesFarFadeDistance: 1
     - _SoftParticlesNearFadeDistance: 0
-    - _SpecularEdge: 0.227
+    - _SpecularEdge: 0
     - _SpecularHighlights: 1
-    - _SpecularOffset: 1
+    - _SpecularOffset: 0
     - _SrcBlend: 1
     - _TintBenDay: 1
     - _UVSec: 0

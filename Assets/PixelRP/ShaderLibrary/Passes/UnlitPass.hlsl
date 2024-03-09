@@ -45,7 +45,7 @@ float4 UnlitPassFragment (Interpolates input) : SV_TARGET {
     #endif
     
     #ifdef _CLIPPING
-        clip(base.a - GetCutoff(input.baseUV));
+        clip(base.a - GetCutoff());
     #endif
 
     #ifdef _PREMULTIPLY_ALPHA

@@ -7,6 +7,13 @@
 #include "../Common/BakedGI.hlsl"
 #include "../Common/LitInput.hlsl"
 
+float4 _Albedo_TexelSize;
+
+float3 SnapToGrid(float3 position, float gridSize)
+{
+	return floor(position / gridSize) * gridSize;
+}
+
 struct Fragments
 {
 	float4 albedo : SV_TARGET0;
@@ -32,8 +39,10 @@ Interpolates GeometryPassVertex(Attributes input) {
 Fragments GeometryPassFragment(Interpolates input) {
 
 	UNITY_SETUP_INSTANCE_ID(input);
+
+	float2 uv = input.baseUV;
 	
-	float4 base = GetBase(input.baseUV);
+	float4 base = GetBase(uv);
 	float3 normalWS = normalize(input.normalWS);
 	
 	Fragments frag;

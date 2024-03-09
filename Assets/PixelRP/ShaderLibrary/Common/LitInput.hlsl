@@ -18,6 +18,9 @@ UNITY_DEFINE_INSTANCED_PROP(float, _Emission)
 UNITY_DEFINE_INSTANCED_PROP(float, _RimEdge)
 UNITY_DEFINE_INSTANCED_PROP(float, _RimOffset)
 
+UNITY_DEFINE_INSTANCED_PROP(float, _DiffuseEdge)
+UNITY_DEFINE_INSTANCED_PROP(float, _DiffuseOffset)
+
 UNITY_DEFINE_INSTANCED_PROP(float, _SpecularEdge)
 UNITY_DEFINE_INSTANCED_PROP(float, _SpecularOffset)
 
@@ -78,7 +81,7 @@ float4 GetBase (float2 baseUV) {
 	return map * color;
 }
 
-float GetCutoff () {
+float GetCutoff() {
 	return UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Cutoff);
 }
 

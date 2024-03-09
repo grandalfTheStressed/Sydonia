@@ -104,7 +104,7 @@ Edges EdgeDetection(GBuffer buffer)
     }
 
     float depth = step(-.20, (depthGradient));
-    float IdEdge = abs(-MaterialIdGradient) > 0 ? 1 : 0;
+    float IdEdge = abs(MaterialIdGradient) > 0 ? 1 : 0;
     float normalCull = abs(MaterialIdGradient) > 0 ? 1 : 0;
     float normal = length(normalGradient);
     Edges edges;

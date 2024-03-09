@@ -21,10 +21,12 @@ public partial class CameraRenderer {
     private static int _offset = Shader.PropertyToID("_Offset");
     private static int _edge = Shader.PropertyToID("_Edge");
     private static int _highlights = Shader.PropertyToID("_Highlights");
-
     private static int _cameraForward = Shader.PropertyToID("_camera_forward");
+    private static int _cameraOffset = Shader.PropertyToID("_CameraOffset");
+    private static int _rtSize = Shader.PropertyToID("_RTSize");
     
     private Material deferredMaterial = new Material(Shader.Find("Pixel RP/DeferredLit"));
+    private Material subPixelMovementMaterial = new Material(Shader.Find("Pixel RP/SubPixelMovement"));
 
     private ScriptableRenderContext context;
 
@@ -41,25 +43,23 @@ public partial class CameraRenderer {
 
     private RenderTexture fxRenderTexture;
 
-    private static int _defaultRenderWidth = (int)(Screen.width * .8);
-    private static int _defaultRenderHeight = (int)(Screen.height * .8);
-
-    public static float DefaultRenderWidth => _defaultRenderWidth;
-
-    public static float DefaultRenderHeight => _defaultRenderHeight;
-    
-    
+    private float renderScale;
 
     public void Render(ScriptableRenderContext context, Camera camera, bool dynamicBatching, bool instancing, ShadowSettings shadowSettings) {
         
         this.context = context;
         this.camera = camera;
+        
+        deferredMaterial = new Material(Shader.Find("Pixel RP/DeferredLit"));
+        subPixelMovementMaterial = new Material(Shader.Find("Pixel RP/SubPixelMovement"));
 
-        if (!this.camera.orthographic) {
-            _defaultRenderWidth = Screen.width;
-            _defaultRenderHeight = Screen.height;
-        }
+        PixelPerfect3DCameraController cameraController = camera.GetComponent<PixelPerfect3DCameraController>();
 
+        renderScale = cameraController != null ? cameraController.Scale : 1;
+        
+        subPixelMovementMaterial.SetVector(_rtSize, new Vector2(camera.pixelWidth * renderScale, camera.pixelHeight * renderScale));
+        subPixelMovementMaterial.SetVector(_cameraOffset, cameraController != null ? cameraController.CameraOffset : Vector2.zero);
+            
         PrepareBuffer();
         PrepareForSceneWindow();
 
@@ -75,16 +75,12 @@ public partial class CameraRenderer {
         DrawDeferredGeometry();
         DrawForwardGeometry();
         DrawGizmos();
-        buffer.Blit(_geometry, BuiltinRenderTextureType.CameraTarget);
+        buffer.Blit(_geometry, BuiltinRenderTextureType.CameraTarget, subPixelMovementMaterial);
         CleanUp();
         Submit();
     }
 
     private void Setup(bool dynamicBatching, bool instancing) {
-
-        if (deferredMaterial == null) {
-            deferredMaterial = new Material(Shader.Find("Pixel RP/DeferredLit"));
-        }
         
         buffer.SetGlobalVector(_cameraForward, camera.transform.forward);
         context.SetupCameraProperties(camera);
@@ -202,27 +198,8 @@ public partial class CameraRenderer {
         
         buffer.GetTemporaryRT(
             renderTextureId, 
-            _defaultRenderWidth, 
-            _defaultRenderHeight, 
-            depth, 
-            FilterMode.Point, 
-            format, 
-            RenderTextureReadWrite.Default,
-            antiAliasing ? QualitySettings.antiAliasing : 1);
-    }
-    
-    private void SetupRenderTexture(
-        int width,
-        int height,
-        ref int renderTextureId,
-        bool antiAliasing, 
-        int depth, 
-        RenderTextureFormat format) {
-        
-        buffer.GetTemporaryRT(
-            renderTextureId, 
-            width, 
-            height, 
+            (int)(camera.pixelWidth * renderScale), 
+            (int)(camera.pixelHeight * renderScale), 
             depth, 
             FilterMode.Point, 
             format, 
