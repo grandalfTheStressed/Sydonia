@@ -59,7 +59,7 @@ public partial class CameraRenderer {
         
         subPixelMovementMaterial.SetVector(_rtSize, new Vector2(camera.pixelWidth * renderScale, camera.pixelHeight * renderScale));
         subPixelMovementMaterial.SetVector(_cameraOffset, cameraController != null ? cameraController.CameraOffset : Vector2.zero);
-            
+        
         PrepareBuffer();
         PrepareForSceneWindow();
 
@@ -69,6 +69,7 @@ public partial class CameraRenderer {
         
         buffer.BeginSample(SampleName);
         ExecuteBuffer();
+
         lighting.Setup(context, cullingResults, shadowSettings);
         buffer.EndSample(SampleName);
         Setup(dynamicBatching, instancing);
@@ -116,6 +117,12 @@ public partial class CameraRenderer {
         SetupRenderTexture(ref _albedo, false, 0, RenderTextureFormat.ARGB32);
         SetupGeometryBuffer();
         buffer.ClearRenderTarget(clearDepth, clearColor, backGroundColor);
+        
+        RenderTexture rt = camera.targetTexture;
+        
+        if(rt != null && rt.graphicsFormat == GraphicsFormat.None) buffer.EnableShaderKeyword("_DEPTH_ONLY");
+        
+        else buffer.DisableShaderKeyword("_DEPTH_ONLY");
         
         buffer.BeginSample(SampleName);
         ExecuteBuffer();

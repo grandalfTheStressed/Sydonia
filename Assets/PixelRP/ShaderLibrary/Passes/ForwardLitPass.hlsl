@@ -21,6 +21,10 @@ Interpolates LitPassVertex(Attributes input) {
 }
 float4 LitPassFragment(Interpolates input) : SV_TARGET {
 
+	#ifdef _DEPTH_ONLY
+		return 1;
+	#endif
+
 	UNITY_SETUP_INSTANCE_ID(input);
 	
 	float4 base = GetBase(input.baseUV);

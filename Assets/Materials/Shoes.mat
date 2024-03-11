@@ -13,6 +13,7 @@ Material:
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords:
+  - _HIGHLIGHTEDGE
   - _HIGHLIGHTS_ON
   - _TINTBENDAY
   - _TINT_SHADING
@@ -103,7 +104,7 @@ Material:
     - _DiffuseOffset: 0
     - _DistanceAttenuationEdge: 0
     - _DstBlend: 0
-    - _EdgeId: 944122
+    - _EdgeId: 0
     - _Emission: 0
     - _FresnelThreshold: 3.7
     - _GlossMapScale: 1
@@ -111,7 +112,7 @@ Material:
     - _GlossyReflections: 1
     - _HighlightBrights: 7.48
     - _HighlightDarks: 1
-    - _HighlightEdge: 0
+    - _HighlightEdge: 1
     - _Highlights: 0
     - _Metallic: 0
     - _Mode: 0

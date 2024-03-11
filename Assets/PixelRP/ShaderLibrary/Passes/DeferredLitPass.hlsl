@@ -12,6 +12,8 @@ SAMPLER(_Offset);
 SAMPLER(_Edge);
 SAMPLER(_Highlights);
 
+sampler2D _LastCameraDepthTexture;
+
 float4 _Albedo_TexelSize;
 
 struct Attributes {
@@ -32,6 +34,10 @@ Interpolates DeferredPassVertex(Attributes input) {
 	return output;
 }
 float4 DeferredPassFragment(Interpolates input) : SV_TARGET {
+
+	#ifdef _DEPTH_ONLY
+		return 1;
+	#endif
 	
 	float2 uv = input.baseUV;
 	

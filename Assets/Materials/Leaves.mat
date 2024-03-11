@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Leaves
-  m_Shader: {fileID: 4800000, guid: 42b3f8cd06c890b4f97def9b767dd033, type: 3}
+  m_Shader: {fileID: 4800000, guid: 9db5f40544a646db869a5800f6a0937f, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -81,34 +81,39 @@ Material:
     - _DiffuseOffset: 0.395
     - _DistanceAttenuationEdge: 0.425
     - _DstBlend: 0
+    - _EdgeId: 101850
     - _Emission: 0
     - _FresnelThreshold: 5
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
+    - _HighlightBrights: 5.71
+    - _HighlightDarks: 0.581
+    - _HighlightEdge: 0
     - _Metallic: 0.73
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _PremulAlpha: 0
-    - _RimEdge: 0.63
-    - _RimOffset: 0.274
+    - _RimEdge: 0
+    - _RimOffset: 0
     - _RimThreshold: 4
     - _Roughness: 0.16
     - _ShadingOffset: 0.863
     - _ShadingResolution: 0.5
     - _Shininess: 0.078125
+    - _Smoothness: 0
     - _SmoothnessTextureChannel: 0
-    - _SpecularEdge: 0.405
+    - _SpecularEdge: 0
     - _SpecularHighlights: 1
-    - _SpecularOffset: 0.411
+    - _SpecularOffset: 0
     - _SrcBlend: 1
     - _TintBenDay: 0
     - _UVSec: 0
     - _WireThickness: 100
     - _ZWrite: 1
     m_Colors:
-    - _BaseColor: {r: 0.6981132, g: 0.6981132, b: 0.6981132, a: 1}
+    - _BaseColor: {r: 0.253649, g: 0.7169812, b: 0.36791873, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _ShadingTint: {r: 0.5, g: 0.5, b: 0.5, a: 1}

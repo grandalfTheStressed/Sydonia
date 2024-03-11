@@ -34,6 +34,10 @@ float4 UnlitPassFragment (Interpolates input) : SV_TARGET {
     float4 baseMap = GetBaseMap(input.baseUV);
     float4 baseColor = GetBaseColor();
 
+    #ifdef _DEPTH_ONLY
+        return 1;
+    #endif
+
     #ifdef _FLIPBOOK_BLENDING
         baseMap = lerp(baseMap, SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, input.flipbookUVB.xy), input.flipbookUVB.z);
     #endif

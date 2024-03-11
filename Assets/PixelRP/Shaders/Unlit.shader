@@ -19,6 +19,7 @@ Shader "Pixel RP/Unlit" {
 			ZWrite [_ZWrite]
 			
 			HLSLPROGRAM
+			#pragma multi_compile _ _DEPTH_ONLY
 			#pragma shader_feature _CLIPPING
             #pragma shader_feature _PREMULTIPLY_ALPHA
 			#pragma multi_compile_instancing

@@ -46,6 +46,7 @@ Shader "Pixel RP/DeferredLit"
            }
 
            HLSLPROGRAM
+           #pragma multi_compile _ _DEPTH_ONLY
            #pragma multi_compile _ _DIRECTIONAL_PCF3 _DIRECTIONAL_PCF5 _DIRECTIONAL_PCF7
            #pragma multi_compile _ _PUNCTUAL_PCF3 _PUNCTUAL_PCF5 _PUNCTUAL_PCF7
            #pragma multi_compile _ _CASCADE_BLEND_SOFT _CASCADE_BLEND_DITHER
