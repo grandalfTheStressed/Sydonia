@@ -1,4 +1,4 @@
-Description
+
 A custom Unity Render Pipeline using a hybrid deffered and forward lighting implementation.
 
 Uses a combination of stylistic toon based lighting, custom pixel perfect edge detection, and couple camera and shaders tricks to make a 
